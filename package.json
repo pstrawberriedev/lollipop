@@ -1,0 +1,39 @@
+{
+  "name": "lolipop",
+  "version": "1.0.0",
+  "description": "a lol stats lookup site",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon server.js --colors",
+    "build": "webpack --progress --colors"
+  },
+  "keywords": [
+    "express",
+    "javascript",
+    "lol"
+  ],
+  "author": "pstrawberriedev",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.15.3",
+    "body-parser": "^1.16.0",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.14.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.22.1",
+    "babel-loader": "^6.2.10",
+    "babel-preset-es2015": "^6.22.0",
+    "copy-webpack-plugin": "^4.0.1",
+    "css-loader": "^0.26.1",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "json-loader": "^0.5.4",
+    "less": "^2.7.2",
+    "less-loader": "^2.2.3",
+    "lodash": "^4.17.4",
+    "moment": "^2.17.1",
+    "webpack": "^1.14.0",
+    "webpack-dev-middleware": "^1.9.0",
+    "wetfish-basic": "^0.7.11"
+  }
+}

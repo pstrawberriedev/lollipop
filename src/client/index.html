@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <title>lollipop | LoL Search</title>
+
+    <!-- Styles -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,900" rel="stylesheet">
+    <link href="styles/bundle.min.css" rel="stylesheet">
+
+  </head>
+  <body class="theme-default">
+
+    <main>
+
+      <section id="search">
+        <h1>Summoner Search</h1>
+        <input type="text" id="name" placeholder="Summoner Name" />
+        <select id="region" value="NA">
+          <option value="NA">NA</option>
+          <option value="EUW">EUW</option>
+          <option value="EUNE">EUNE</option>
+          <option value="BR">BR</option>
+          <option value="KR">KR</option>
+          <option value="JP">JP</option>
+          <option value="OCE">OCE</option>
+          <option value="TR">TR</option>
+          <option value="RU">RU</option>
+          <option value="LAN">LAN</option>
+          <option value="LAS">LAS</option>
+        </select>
+      </section>
+
+      <section id="summoner"></section>
+
+    </main>
+
+    <!-- Loader -->
+    <div id="loader">Loading&#8230;</div>
+    <!-- Scripts -->
+    <script src="scripts/bundle.min.js"></script>
+  </body>
+</html>

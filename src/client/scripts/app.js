@@ -2,11 +2,14 @@ import $ from 'wetfish-basic';
 import axios from 'axios';
 import _ from 'lodash';
 const LS = localStorage;
+const apiRoot = 'http://localhost:3000'
 
 let app = {
 
   init() {
 
+    app.$logLocalData = $('#logLocalData');
+    app.$dumpLocalData = $('#dumpLocalData');
     app.$loader = $('#loader');
     app.$loading = $('#loading');
     app.$error = $('#error');
@@ -60,8 +63,6 @@ let app = {
       if(key.name === self.currentSummoner.name) {
         self.localData[index] = self.currentSummoner;
         LS.setItem('summoners', JSON.stringify(self.localData));
-        console.log('Updated Local Summoner Data for ' + self.currentSummoner.name + ':');
-        console.log(self.localData);
         self.hideLoader();
       }
     })
@@ -84,6 +85,7 @@ let app = {
   anon() {
     const self = this;
 
+    // Search Handlers
     this.$sumName.on('keyup', function(e) {
       self.sumName = $(this).value().replace(/\s/g,'');
       if(e.which === 13) {
@@ -96,6 +98,17 @@ let app = {
         self.getSummoner(self.sumName + '', self.sumRegion + '');
       }
     });
+
+    // Debug Buttons
+    self.$logLocalData.on('click', function() {
+      console.log('%c Logging localStorage.summoners ', 'background: #ddd; color: #5e4013;');
+      console.log(self.localData);
+    })
+    self.$dumpLocalData.on('click', function() {
+      console.log('%c Garboed localStorage.summoners ', 'background: #ddd; color: #5e4013;');
+      LS.removeItem('summoners');
+      location.reload();
+    })
 
     // Anon Resets (page load)
     self.$summonerInfo.removeClass('active');
@@ -136,8 +149,9 @@ let app = {
       console.log(sumName + ' in Local Data');
       self.getLocalSummoner(sumName);
     } else {
+      console.log('---------------------');
       console.log('Searching for ' + sumName + ' @ ' + sumRegion);
-      axios.post('/api/summoner', {
+      axios.post(apiRoot + '/api/summoner', {
         name: sumName,
         region: sumRegion
       })
@@ -170,7 +184,7 @@ let app = {
     self.showLoader('Getting Summoner Stats');
 
     console.log('Getting stats for ' + self.currentSummoner.name + ' @ ' + self.currentSummoner.region + ' (' + self.currentSummoner.id + ')')
-    axios.post('/api/summoner-stats', {
+    axios.post(apiRoot + '/api/summoner-stats', {
       summonerID: self.currentSummoner.id,
       region: self.currentSummoner.region
     })
@@ -217,7 +231,7 @@ let app = {
     self.showLoader('Getting Matches');
 
     console.log('Getting matches for ' + self.currentSummoner.name + ' @ ' + self.currentSummoner.region + ' (' + self.currentSummoner.id + ')')
-    axios.post('/api/matches', {
+    axios.post(apiRoot + '/api/matches', {
       summonerID: self.currentSummoner.id,
       region: self.currentSummoner.region,
       start: 0,
@@ -266,7 +280,7 @@ let app = {
     console.log(indexPos);
 
     // console.log('Getting matches for ' + self.currentSummoner.name + ' @ ' + self.currentSummoner.region + ' (' + self.currentSummoner.id + ')')
-    // axios.post('/api/matches', {
+    // axios.post(apiRoot + '/api/matches', {
     //   summonerID: self.currentSummoner.id,
     //   region: self.currentSummoner.region,
     //   start: self.currentSummoner.matchIndexPosition,

@@ -13,7 +13,7 @@ module.exports = {
   context: path.join(__dirname, 'dist'), // copy-webpack-plugin output path
   entry: [
     path.join(__dirname, "src/client/scripts/app.js"), // react,cjs -> js
-    path.join(__dirname, "src/client/styles/index.js") // less -> css
+    path.join(__dirname, "src/client/styles/index.js"), // less -> css
     //path.join(__dirname, "src/images/index.js") // images -> images++
   ],
 

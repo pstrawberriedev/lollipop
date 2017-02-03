@@ -9,6 +9,7 @@ var webpackDevMiddleware = require('webpack-dev-middleware');
 var webpackDevConfig = require('./webpack.dev.config');
 var compiler = webpack(webpackDevConfig);
 var router = require('./src/api/router');
+var cors = require('cors');
 var app = express();
 
 // Middlewares
@@ -22,6 +23,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // Routes
+if (app.get('env') === 'development') { app.use(cors()) }
 app.get('/', function(req, res) {
   res.send('./client/index.html');
 });

@@ -1,4 +1,36 @@
 #summoner {
+  display:block;
+  position:relative;
+  .clearfix;
   padding:15px;
-  border:3px solid transparent;
+
+  // Info
+  .info {
+    display:none;
+    border:3px solid transparent;
+    padding:8px 15px 15px 15px;
+
+    .clearfix;
+    &.active {display:block;}
+  }
+  .icon {
+    float:left;
+    width:auto;
+    max-height:128px;
+    margin-right:15px;
+  }
+  .name {
+    .font-logo;
+    font-size:2rem;
+    margin-bottom:15px;
+  }
+
+  // Matches
+  .matches {
+    display:none;
+    
+    .clearfix;
+    &.active {display:block;}
+  }
+
 }

@@ -18,7 +18,10 @@
 
       <section id="search">
         <h1>Summoner Search</h1>
-        <input type="text" id="name" placeholder="Summoner Name" />
+        <div class="inline-block relative">
+          <input type="text" id="name" placeholder="Summoner Name" />
+          <select id="autocomplete"></select>
+        </div>
         <select id="region" value="NA">
           <option value="NA">NA</option>
           <option value="EUW">EUW</option>
@@ -34,12 +37,17 @@
         </select>
       </section>
 
-      <section id="summoner"></section>
+      <section id="summoner">
+        <div class="info"></div>
+        <div class="matches"></div>
+      </section>
 
     </main>
 
-    <!-- Loader -->
+    <!-- Off-Page Elements -->
     <div id="loader">Loading&#8230;</div>
+    <div id="loading"></div>
+    <div id="error"></div>
     <!-- Scripts -->
     <script src="scripts/bundle.min.js"></script>
   </body>

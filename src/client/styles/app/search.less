@@ -1,4 +1,5 @@
 #search {
+  position:relative;
   width:80%;
   margin:1.5rem auto;
   text-align:center;
@@ -7,7 +8,9 @@
     text-align:center;
     margin-bottom:1rem;
   }
-  #name,#region {
+  #name,#region,#autocomplete {
+    position:relative;
+    z-index:2;
     display:inline-block;
     margin:0 auto;
     border:0;
@@ -15,4 +18,12 @@
     padding:.3rem;
   }
   #name {margin-right:.25rem;}
+  #autocomplete {
+    display:block;
+    padding:.28rem;
+    position:absolute;
+    z-index:1;
+    top:0;
+    left:0;
+  }
 }

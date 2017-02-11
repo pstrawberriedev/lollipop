@@ -1,34 +1,47 @@
 #summoner {
-  display:block;
+  display:none;
   position:relative;
+  max-width:900px;
+  margin:auto;
   .clearfix;
-  padding:15px;
 
   // Info
   .info {
-    display:none;
-    border:3px solid transparent;
     padding:8px 15px 15px 15px;
-
+    .border-radius(2px);
     .clearfix;
-    &.active {display:block;}
   }
   .icon {
     float:left;
     width:auto;
-    max-height:128px;
+    max-height:100px;
     margin-right:15px;
   }
-  .name {
-    .font-logo;
-    font-size:2rem;
-    margin-bottom:15px;
+  .name { margin-bottom:15px; }
+
+  // Recent Games
+  .recent {
+    .clearfix;
+    width:100%;
+    padding:15px;
+
+      .game {
+        .clearfix;
+        .border-radius(2px);
+        position:relative;
+        margin-top:15px;
+
+          img {
+            max-width:100px;
+            height:auto;
+            .border-radius(2px);
+          }
+      }
   }
 
   // Matches
   .matches {
-    display:none;
-    
+
     .clearfix;
     &.active {display:block;}
   }

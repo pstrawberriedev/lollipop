@@ -8,20 +8,34 @@
     <title>lollipop | LoL Search</title>
 
     <!-- Styles -->
-    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,900" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Kalam|Quicksand" rel="stylesheet">
     <link href="styles/bundle.min.css" rel="stylesheet">
 
   </head>
   <body class="theme-default">
 
-    <main>
-
-      <section id="search">
-        <h1>Summoner Search</h1>
-        <div class="inline-block relative">
-          <input type="text" id="name" placeholder="Summoner Name" />
-          <select id="autocomplete"></select>
+    <nav id="nav">
+      <div id="nav-main">
+        <div class="left">
+          <a id="logo" href="/">Lollipop!</a>
+          <div class="search"></div>
         </div>
+        <div class="right">
+          <div class="inline-block relative">
+            <span id="dev-button" class="nav-icon icon-bug"></span>
+            <div id="dev-menu" class="menu">
+              <span id="logLocalData" class="nav-icon icon-code" title="Log localData to developer console"></span>
+              <span id="dumpLocalData" class="nav-icon icon-cross" title="Dump localData"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <section id="search">
+      <h1 id="title">Summoner Search</h1>
+      <div id="search-wrap">
+        <input type="text" id="name" placeholder="Summoner Name..." />
         <select id="region" value="NA">
           <option value="NA">NA</option>
           <option value="EUW">EUW</option>
@@ -35,11 +49,22 @@
           <option value="LAN">LAN</option>
           <option value="LAS">LAS</option>
         </select>
-      </section>
+      </div>
+    </section>
+
+    <main>
 
       <section id="summoner">
-        <div class="info"></div>
-        <div class="matches"></div>
+        <section class="left"></section>
+
+        <section class="middle">
+          <div class="info"></div>
+          <div class="recent"></div>
+          <div class="matches"></div>
+        </section>
+
+        <section class="right"></section>
+
       </section>
 
     </main>
@@ -48,8 +73,6 @@
     <div id="loader">Loading&#8230;</div>
     <div id="loading"></div>
     <div id="error"></div>
-    <div id="logLocalData" style="cursor:pointer;font-size:.8rem;position:fixed;top:10px;right:10px;padding:6px 15px;background:#444;border:2px solid #666;">Log localData</div>
-    <div id="dumpLocalData" style="cursor:pointer;font-size:.8rem;position:fixed;top:46px;right:10px;padding:6px 15px;background:#444;border:2px solid #666;">Dump localData</div>
     <!-- Scripts -->
     <script src="scripts/bundle.min.js"></script>
   </body>

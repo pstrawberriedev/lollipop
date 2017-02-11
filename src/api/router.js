@@ -1,5 +1,6 @@
 var express = require('express');
 var axios = require('axios');
+var riotCall = axios.create({ timeout: 3000 });
 var _ = require('lodash');
 var router = express.Router();
 var apiKey = require('./secret.js');
@@ -26,6 +27,12 @@ function buildMatchesUrl(region, summonerID) {
       summonerID + apiKey;
   return newUrl;
 }
+function buildRecentUrl(region, summonerID) {
+  var newUrl = buildRegionUrl(region) +
+      region + '/v1.3/game/by-summoner/' +
+      summonerID + '/recent' + apiKey;
+  return newUrl;
+}
 
 // ++ API POSTS
 router.post('/summoner', function(req, res) {
@@ -37,7 +44,7 @@ router.post('/summoner', function(req, res) {
   console.log('Searching Summoner ' + summoner + ' @ ' + region);
   console.log(queryUrl);
 
-  axios.get(queryUrl)
+  riotCall.get(queryUrl)
   .then(function (response) {
     console.log(response.data[summoner]);
     var date = new Date();
@@ -62,7 +69,7 @@ router.post('/summoner-stats', function(req, res) {
 
   console.log('------');
   console.log('Searching Summoner Stats ' + summonerID + ' @ ' + region);
-  axios.get(queryUrl)
+  riotCall.get(queryUrl)
   .then(function (response) {
     var newObj = {};
     _.forEach(response.data.playerStatSummaries, function(val, index) {
@@ -91,7 +98,30 @@ router.post('/matches', function(req, res) {
   console.log('Searching SummonerID Matches' + summonerID + ' @ ' + region);
   console.log(queryUrl);
 
-  axios.get(queryUrl)
+  riotCall.get(queryUrl)
+  .then(function (response) {
+    res.json(response.data);
+  })
+  .catch(function (error) {
+    console.log(error);
+    if(error.response.status === 404) {
+      res.json({error: 404});
+    }
+    res.send('Couldn\'t Get Summoner Matches');
+  });
+
+});
+
+router.post('/recent', function(req, res) {
+  var summonerID = req.body.summonerID + '';
+  var region = req.body.region + '';
+  var queryUrl = buildRecentUrl(region, summonerID);
+
+  console.log('------');
+  console.log('Searching SummonerID Recent Games' + summonerID + ' @ ' + region);
+  console.log(queryUrl);
+
+  riotCall.get(queryUrl)
   .then(function (response) {
     res.json(response.data);
   })

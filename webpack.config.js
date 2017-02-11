@@ -47,7 +47,8 @@ module.exports = {
     }),
     new CopyWebpackPlugin([
       {from: path.join(__dirname, "src/client/index.html")},
-      {from: path.join(__dirname, "src/client/images"), to: "images"}
+      {from: path.join(__dirname, "src/client/images"), to: "images"},
+      {from: path.join(__dirname, "src/client/fonts"), to: "fonts"}
     ])
   ]
 

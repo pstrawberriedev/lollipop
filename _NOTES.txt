@@ -1,0 +1,9 @@
+Relevant game types (stats)
+"playerStatSummaryType": "RankedSolo5x5"
+"playerStatSummaryType": "Unranked"
+"playerStatSummaryType": "CAP5x5"
+"playerStatSummaryType": "AramUnranked5x5"
+"playerStatSummaryType": "RankedTeam3x3"
+"playerStatSummaryType": "Unranked3x3"
+"playerStatSummaryType": "CoopVsAI3x3"
+"playerStatSummaryType": "CoopVsAI"

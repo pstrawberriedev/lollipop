@@ -1,8 +1,10 @@
-import $ from 'wetfish-basic';
+import $ from 'jquery';
+import TweenMax from 'gsap';
 import axios from 'axios';
 import _ from 'lodash';
 const LS = localStorage;
 const apiRoot = 'http://localhost:3000'
+import champions from '../data/champions.json';
 
 let app = {
 
@@ -22,8 +24,16 @@ let app = {
     app.currentSummoner = {};
     app.extraMatches = [];
 
+    app.$nav = $('#search');
+    app.$devButton = $('#dev-button');
+    app.$devMenu = $('#dev-menu');
+    app.$search = $('#search');
+    app.$searchBar = $('#search-wrap');
+    app.$searchTitle = $('#search #title');
+    app.$summonerArea = $('#summoner');
     app.$summonerInfo = $('#summoner .info');
     app.$summonerMatches = $('#summoner .matches');
+    app.$summonerRecent = $('#summoner .recent');
 
     console.log('%c Lollipop App Started ', 'background: #ddd; color: #9b1851;font-weight:bold;');
     this.syncLocalData();
@@ -31,7 +41,7 @@ let app = {
 
   },
 
-  // Local Summoner Data
+  // Local Summoner Data Functions
   storeLocalSummoner(data) {
     this.localData.push(data);
     this.autocompleteSummoners.push(data.name.toLowerCase());
@@ -51,6 +61,7 @@ let app = {
       if(key.name.toLowerCase() === name) {
         self.currentSummoner = key;
         self.displaySummoner();
+        self.displaySummonerRecentGames();
         self.hideLoader();
       }
     })
@@ -81,21 +92,56 @@ let app = {
     }
   },
 
+  // Convert: Champion ID -> Champion Name
+  championIdToName(champID) {
+    var champ = '';
+    _.forEach(champions.data, function(key) {
+      if(parseInt(key['key']) === champID) {
+        champ = key.id;
+        return false;
+      }
+    })
+    return champ;
+  },
+
   // Anonymous Funcs
   anon() {
     const self = this;
+    var nav = document.getElementById('search');
+    var searchBox = document.getElementById('search-wrap');
+    var title = document.getElementById('title');
+    var devMenu = document.getElementById('dev-menu');
+
+    // Nav Debug Menu
+    self.$devButton.off('click').on('click', function() {
+      if(!self.$devMenu.hasClass('on')) {
+        TweenMax.to(devMenu, .25, { height:'65px', autoAlpha:1, ease:Sine.easeInOut });
+        self.$devMenu.addClass('on');
+      } else {
+        TweenMax.to(devMenu, .25, { height:0, autoAlpha:0, ease:Sine.easeInOut });
+        self.$devMenu.removeClass('on');
+      }
+      $(document).off('click').on('click', function(e) {
+        if(!$(e.target).closest(self.$devButton).length && self.$devMenu.hasClass('on')) {
+          TweenMax.to(devMenu, .25, { height:0, autoAlpha:0, ease:Sine.easeInOut });
+          self.$devMenu.removeClass('on');
+        }
+      })
+    })
 
     // Search Handlers
     this.$sumName.on('keyup', function(e) {
-      self.sumName = $(this).value().replace(/\s/g,'');
+      self.sumName = $(this).val().replace(/\s/g,'');
       if(e.which === 13) {
         self.getSummoner(self.sumName, self.sumRegion);
+        self.searchShrink();
       }
     });
     this.$sumRegion.on('change', function() {
       self.sumRegion = $(this).value().toLowerCase();
       if(self.$sumName.value().replace(/\s/g,'') != '') {
         self.getSummoner(self.sumName + '', self.sumRegion + '');
+        self.searchShrink();
       }
     });
 
@@ -115,27 +161,41 @@ let app = {
     self.$summonerMatches.removeClass('active');
   },
 
+  // Search Shrink/Expand
+  searchShrink() {
+    const self = this;
+    TweenMax.to(self.$searchTitle, .2, { y:'50px', autoAlpha:0, ease:Sine.easeInOut });
+    TweenMax.to(self.$search, .35, { padding:0, height:0, ease:Sine.easeInOut });
+    TweenMax.to(self.$searchBar, .35, { y:'-50px', autoAlpha:0, ease:Sine.easeInOut, onComplete:cloneSearch });
+    function cloneSearch() {
+      self.$searchBar.detach().appendTo($('#nav-main .left .search'));
+      $('#logo').fadeIn();
+      TweenMax.to($('#logo'), .35, { x:0, autoAlpha:1, ease:Sine.easeInOut});
+      TweenMax.to(self.$searchBar, .35, { y:0, autoAlpha:1, ease:Sine.easeInOut});
+    }
+  },
+
   // loader
   showLoader(message) {
-    this.$loader.style({'display':'block'});
+    this.$loader.show();
     if(message) {
-      this.$loading.style({'display':'block'});
+      this.$loading.show();
       this.$loading.html(message);
     }
   },
   hideLoader() {
-    this.$loading.style({'display':'none'});
-    this.$loader.style({'display':'none'});
+    this.$loading.hide();
+    this.$loader.hide();
   },
 
   // Error Display
   showError(message) {
     const self = this;
     this.$error.html(message);
-    this.$error.style({'display':'block'});
+    this.$error.show();
     setTimeout(function() {
       self.$error.html('');
-      self.$error.style({'display':'none'});
+      self.$error.hide();
     },3500)
   },
 
@@ -166,12 +226,13 @@ let app = {
           if(response.data.error === 404) {
             self.showError('Summoner ' + sumName + ' @ ' + sumRegion.toUpperCase() + ' was not found');
           } else {
-            self.showError('Something went wrong - please try again or submit an issue on Github');
+            self.showError('Something went wrong with the summoner lookup');
           }
         }
       })
       .catch(function (error) {
         self.hideLoader();
+        self.showError('Something error happened when getting summoner');
         console.log(error);
       });
     }
@@ -193,13 +254,14 @@ let app = {
       if(!response.data.error) {
         self.currentSummoner.stats = response.data;
         self.updateCurrentSummoner();
-        self.getCurrentSummonerMatches();
+        self.getCurrentSummonerRecentGames();
       } else {
         self.showError('Error getting summoner stats');
       }
     })
     .catch(function (error) {
       self.hideLoader();
+      self.showError('Something error happened when getting summoner stats');
       console.log(error);
     });
 
@@ -208,13 +270,13 @@ let app = {
   // Display Current Summoner
   displaySummoner() {
     const self = this;
-    self.$summonerInfo.addClass('active');
+    self.$summonerArea.show();
     self.$summonerInfo.html('');
 
     // Name
     if(self.currentSummoner.name) {
       self.$summonerInfo.append(
-        '<div class="name">' + self.currentSummoner.name + '</div>'
+        '<h3 class="name">' + self.currentSummoner.name + '</h3>'
       );
     }
     // Profile Icon
@@ -245,12 +307,20 @@ let app = {
         self.currentSummoner.matchTotal = response.data.totalGames;
         self.updateCurrentSummoner();
       } else {
-        var noMatches = response.data.totalGames === 0 ? ' ' + self.currentSummoner.name + ' has 0 matches (or is banned?)' : '';
+        // if no matches, throw an 'unranked' flag
+        var noMatches = response.data.totalGames === 0 ? ' ' + self.currentSummoner.name + ' - no matches found' : '';
+        if(noMatches != '') {
+          self.currentSummoner.unranked = 1;
+          self.updateCurrentSummoner();
+        }
         self.showError('Error getting matches' + noMatches);
       }
     })
     .catch(function (error) {
+      self.currentSummoner.unranked = 1;
+      self.updateCurrentSummoner();
       self.hideLoader();
+      self.showError('Something error happened when getting matches');
       console.log(error);
     });
 
@@ -269,49 +339,57 @@ let app = {
     }
   },
 
-  // Get More Current Summoner Matches
-  getMoreSummonerMatches() {
+  // Get Summoner Recent Games
+  getCurrentSummonerRecentGames() {
     const self = this;
-    self.showLoader('Getting Matches');
-    self.currentSummoner.matchPullAmount = 25;
+    self.showLoader('Getting Recent Games');
 
-    //check for stored matches
-    var indexPos = self.extraMatches.length;
-    console.log(indexPos);
-
-    // console.log('Getting matches for ' + self.currentSummoner.name + ' @ ' + self.currentSummoner.region + ' (' + self.currentSummoner.id + ')')
-    // axios.post(apiRoot + '/api/matches', {
-    //   summonerID: self.currentSummoner.id,
-    //   region: self.currentSummoner.region,
-    //   start: self.currentSummoner.matchIndexPosition,
-    //   end: self.currentSummoner.matchIndexPosition + self.currentSummoner.matchPullAmount,
-    //   amount: self.currentSummoner.matchPullAmount
-    // })
-    // .then(function (response) {
-    //   self.hideLoader();
-    //   if(!response.data.error) {
-    //     var newArr = [...response.data.matches];
-    //     var currentArr = self.currentSummoner.matches;
-    //     if(!currentArr) {
-    //       self.currentSummoner.matches = newArr;
-    //     } else {
-    //       self.currentSummoner.matches = [...currentArr, ...newArr];
-    //     }
-    //
-    //     self.currentSummoner.matchTotal = response.data.totalGames;
-    //     self.currentSummoner.matchIndexPosition = self.currentSummoner.matchIndexPosition + self.currentSummoner.matchPullAmount;
-    //     self.updateCurrentSummoner();
-    //   } else {
-    //     self.showError('Error getting matches');
-    //   }
-    // })
-    // .catch(function (error) {
-    //   self.hideLoader();
-    //   console.log(error);
-    // });
+    console.log('Getting recent games for ' + self.currentSummoner.name + ' @ ' + self.currentSummoner.region + ' (' + self.currentSummoner.id + ')')
+    axios.post(apiRoot + '/api/recent', {
+      summonerID: self.currentSummoner.id,
+      region: self.currentSummoner.region
+    })
+    .then(function (response) {
+      self.hideLoader();
+      if(!response.data.error && response.data.games.length > -1) {
+        var newArr = [...response.data.games];
+        self.currentSummoner.recent = newArr;
+        self.updateCurrentSummoner();
+        self.getCurrentSummonerMatches();
+        self.displaySummonerRecentGames();
+      } else {
+        // if no matches, throw an 'unranked' flag
+        var noMatches = !response.data.games.length > -1 ? ' ' + self.currentSummoner.name + ' - no recent games found' : '';
+        self.showError('Error getting recent games' + noMatches);
+      }
+    })
+    .catch(function (error) {
+      self.hideLoader();
+      self.showError('Something error happened when getting recent games');
+      console.log(error);
+    });
 
   },
 
+  // Display Current Summoner Recent Games
+  displaySummonerRecentGames() {
+    const self = this;
+    self.$summonerRecent.html('');
+    self.$summonerRecent.append('<h3>Recent Games</h3>');
+
+    // Recent Games loop
+    for(let value of self.currentSummoner.recent) {
+      let win = value.stats.win ? 'win' : 'loss';
+      self.$summonerRecent.append(
+      '<div class="game ' + win +'">' + // open
+      '<img class="icon" src="http://ddragon.leagueoflegends.com/cdn/7.3.1/img/champion/' + self.championIdToName(value.championId) + '.png" />' + //hero portrait
+
+      '</div>' // close
+      );
+    }
+  }
+
 }
 
+window.lollipop = app;
 app.init();

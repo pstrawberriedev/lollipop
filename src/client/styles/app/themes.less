@@ -3,21 +3,56 @@
 */
 
 // color vars
-@default-bg: #111;
+@default-primary: #3FB8AF;
+@default-secondary: #FF3D7F;
+@default-cream: #FF9E9D;
+@default-yellow: #DAD8A7;
+@default-green: #7FC7AF;
+
 @default-light: #fafafa;
-@default-dark: #060606;
+@default-nav: #f0f0f0;
+@default-darker: #0a0a0a;
+@default-dark: #222;
 @default-gray: #aaa;
 
 @default-error: #c41d1d;
 @default-success: #135e35;
 @default-info: #5e4013;
 
+@bg-loss: #380202;
+@bg-win: #0d3802;
+
 // theme styling
 body.theme-default {
-  background:@default-bg;
-  color:@default-light;
+  background:@default-primary;
+  color:@default-darker;
 
-  #error {background:@default-error;}
-  #summoner .info {border-color:@default-gray;}
+  #error {background:@default-yellow;}
+  #loading {color:@default-light;}
+
+  #logo {color:@default-secondary;}
+  nav#nav {
+    background:@default-nav;
+
+      #nav-main .nav-icon {border-color:@default-dark;color:@default-dark;}
+      #dev-menu {background:@default-dark;}
+      .search #region, .search #name {
+        background:@default-secondary;
+        color:@default-light;
+        border-color:#ff548e;
+      }
+      .search #name::-webkit-input-placeholder {color: #efa9c1;}
+      .search #name::-moz-placeholder {color: #861e41;}
+      .search #name:-ms-input-placeholder {color: #861e41;}
+      .search #name:-moz-placeholder {color: #861e41;}
+  }
+  #search {
+    background:@default-secondary;
+    #title {
+      color:@default-light;
+      text-shadow: 0px 2px 3px rgba(0, 0, 0, .5);
+    }
+  }
+
 
 }

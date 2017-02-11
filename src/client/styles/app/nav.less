@@ -1,7 +1,77 @@
-nav {
-  display:block;
-  position:relative;
-  padding:12px;
-  text-align:center;
-  background:@default-dark;
+nav#nav {
+  .block;
+  .fixed;
+  height:50px;
+  top:0;
+  width:100%;
+  .clearfix;
+  //.shadow-1;
+  z-index:10;
+
+  #logo {
+    .relative;
+    .inline-block;
+    display:none;
+    .font-logo;
+    padding:7px;
+    font-size:2rem;
+    font-weight:bold;
+  }
+  #nav-main {
+    .absolute;
+    .clearfix;
+    left:0;right:0;
+    padding:0 10px;
+    height:100%;
+    max-width:1024px;
+    margin:auto;
+    color:@default-light;
+
+      .left,.right {float:left;width:70%;.relative;}
+      .right {text-align:right;width:30%}
+
+      .search {
+        .clearfix;
+        .relative;
+        .inline-block;
+        height:35px;
+        width:250px;
+      }
+
+      .nav-icon {
+        .inline-block;
+        cursor:pointer;
+        font-size:2rem;
+        padding:4px 5px;
+        margin-top:4px;
+          &.border {
+            font-size:1.3rem;
+            padding:4px 5px;
+            margin-top:8px;
+            .border-radius(50%);
+            border:2px solid;
+          }
+      }
+
+  }
+  #dev-menu {
+    .block;
+    .absolute;
+    overflow:hidden;
+    .opacity(0);
+    height:0;
+    //height: 66px;
+
+    left:0;
+    right:0;
+    width:100%;
+    padding: .4rem .12rem 0 0;
+    .shadow-2;
+    .nav-icon {
+      font-size:1.3rem;
+      margin-right:3px;
+      margin-top:0;
+    }
+  }
+
 }

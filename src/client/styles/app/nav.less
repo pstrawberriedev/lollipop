@@ -5,7 +5,8 @@ nav#nav {
   top:0;
   width:100%;
   .clearfix;
-  //.shadow-1;
+  .shadow-1;
+  //.bottom-outset;
   z-index:10;
 
   #logo {
@@ -21,21 +22,34 @@ nav#nav {
     .absolute;
     .clearfix;
     left:0;right:0;
-    padding:0 10px;
+    padding-left:10px;
     height:100%;
     max-width:1024px;
     margin:auto;
     color:@default-light;
 
-      .left,.right {float:left;width:70%;.relative;}
-      .right {text-align:right;width:30%}
+      .left,.right {float:left;width:90%;.relative;}
+      .right {text-align:right;width:10%}
+
+      .link {
+        .inline-block;
+        .relative;
+        height:100%;
+        font-weight:bold;
+        font-size:.85rem;
+        margin-right:1.2rem;
+        .transform(translateY(-.3rem));
+        .transition(opacity .15s ease-in-out);
+        &:hover {.opacity(.6)}
+      }
 
       .search {
         .clearfix;
         .relative;
         .inline-block;
         height:35px;
-        width:250px;
+        width:0;
+        //width:250px;
       }
 
       .nav-icon {
@@ -54,19 +68,20 @@ nav#nav {
       }
 
   }
+
   #dev-menu {
     .block;
     .absolute;
     overflow:hidden;
     .opacity(0);
-    height:0;
-    //height: 66px;
-
+    height: 0;
+    top:48px;
     left:0;
     right:0;
     width:100%;
     padding: .4rem .12rem 0 0;
     .shadow-2;
+    z-index:20;
     .nav-icon {
       font-size:1.3rem;
       margin-right:3px;

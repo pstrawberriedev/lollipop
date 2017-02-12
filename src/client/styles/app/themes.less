@@ -1,5 +1,6 @@
 /*
-  Default Theme
+  Default Theme, insipiration:
+  http://www.colourlovers.com/palette/932683/Compatible
 */
 
 // color vars
@@ -14,13 +15,13 @@
 @default-darker: #0a0a0a;
 @default-dark: #222;
 @default-gray: #aaa;
+@default-gray-lighter: #ddd;
 
-@default-error: #c41d1d;
+@default-error: #bf4141;
 @default-success: #135e35;
 @default-info: #5e4013;
 
-@bg-loss: #380202;
-@bg-win: #0d3802;
+@default-award: #175960;
 
 // theme styling
 body.theme-default {
@@ -30,29 +31,48 @@ body.theme-default {
   #error {background:@default-yellow;}
   #loading {color:@default-light;}
 
-  #logo {color:@default-secondary;}
+  // Nav + Logo
+  //#logo {color:@default-secondary;}
   nav#nav {
     background:@default-nav;
 
+      #nav-main .link {color:@default-dark;}
       #nav-main .nav-icon {border-color:@default-dark;color:@default-dark;}
-      #dev-menu {background:@default-dark;}
-      .search #region, .search #name {
-        background:@default-secondary;
-        color:@default-light;
-        border-color:#ff548e;
-      }
-      .search #name::-webkit-input-placeholder {color: #efa9c1;}
-      .search #name::-moz-placeholder {color: #861e41;}
-      .search #name:-ms-input-placeholder {color: #861e41;}
-      .search #name:-moz-placeholder {color: #861e41;}
+      #dev-menu {background:@default-nav;}
+      #dev-menu.swap {background:@default-secondary;}
   }
+
+  // Search
   #search {
     background:@default-secondary;
-    #title {
+    h1#title {
       color:@default-light;
-      text-shadow: 0px 2px 3px rgba(0, 0, 0, .5);
+      //text-shadow: 0px 2px 3px rgba(0, 0, 0, .5);
     }
   }
 
+  // Summoner
+  #summoner {
+
+    //info
+    #summoner-info {
+      color:@default-light;
+      background:@default-primary;
+    }
+
+    //recent
+    #recent-games {
+      .deaths {color:@default-error;}
+      .wl {color:@default-light;}
+      .wl.win {background:@default-success;}
+      .wl.loss {background:@default-error;}
+      .award {
+        background:@default-award;
+        color:@default-light;
+        .icon-star {color:@default-yellow;}
+      }
+      .cs,.gold {background:@default-gray-lighter;}
+    }
+  }
 
 }

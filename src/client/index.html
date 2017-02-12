@@ -8,7 +8,7 @@
     <title>lollipop | LoL Search</title>
 
     <!-- Styles -->
-    <link href="https://fonts.googleapis.com/css?family=Kalam|Quicksand" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Kalam:400,700|Quicksand" rel="stylesheet">
     <link href="styles/bundle.min.css" rel="stylesheet">
 
   </head>
@@ -19,13 +19,16 @@
         <div class="left">
           <a id="logo" href="/">Lollipop!</a>
           <div class="search"></div>
+          <a class="link" href="#coming-soon"><span class="icon-triangle-right"></span> Champion List</a>
+          <a class="link" href="https://developer.riotgames.com/api/methods" target="_blank"><span class="icon-triangle-right"></span> Riot Developer API</a>
         </div>
         <div class="right">
           <div class="inline-block relative">
-            <span id="dev-button" class="nav-icon icon-bug"></span>
+            <a href="##" id="dev-button" class="nav-icon icon-dots-three-vertical"></a>
             <div id="dev-menu" class="menu">
-              <span id="logLocalData" class="nav-icon icon-code" title="Log localData to developer console"></span>
-              <span id="dumpLocalData" class="nav-icon icon-cross" title="Dump localData"></span>
+              <a href="https://github.com/pstrawberriedev/lollipop" target="_blank" title="Lollipop Github repo" class="nav-icon icon-github"></a>
+              <span id="logLocalData" class="nav-icon icon-level-down" title="Log localData to developer console"></span>
+              <span id="dumpLocalData" class="nav-icon icon-warning" title="Dump localData"></span>
             </div>
           </div>
         </div>
@@ -33,7 +36,7 @@
     </nav>
 
     <section id="search">
-      <h1 id="title">Summoner Search</h1>
+      <h1 id="title">Lollipop!</h1>
       <div id="search-wrap">
         <input type="text" id="name" placeholder="Summoner Name..." />
         <select id="region" value="NA">
@@ -55,15 +58,18 @@
     <main>
 
       <section id="summoner">
-        <section class="left"></section>
 
-        <section class="middle">
-          <div class="info"></div>
-          <div class="recent"></div>
-          <div class="matches"></div>
-        </section>
-
-        <section class="right"></section>
+          <div id="summoner-info">
+            <div id="info-wrap"></div>
+          </div>
+          <div class="summoner-wrap">
+            <div id="recent-games">
+              <div id="recent-wrap"></div>
+            </div>
+            <div id="matches">
+              <div id="matches-wrap"></div>
+            </div>
+          </div>
 
       </section>
 

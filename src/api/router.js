@@ -21,6 +21,12 @@ function buildStatsUrl(region, summonerID) {
       summonerID + '/summary' + apiKey;
   return newUrl;
 }
+function buildLeagueUrl(region, summonerID) {
+  var newUrl = buildRegionUrl(region) +
+      region + '/v2.5/league/by-summoner/' +
+      summonerID + apiKey;
+  return newUrl;
+}
 function buildMatchesUrl(region, summonerID) {
   var newUrl = buildRegionUrl(region) +
       region + '/v2.2/matchlist/by-summoner/' +
@@ -46,6 +52,7 @@ router.post('/summoner', function(req, res) {
 
   riotCall.get(queryUrl)
   .then(function (response) {
+    console.log('>> API Rate Limit: ' + response.headers['x-rate-limit-count']);
     console.log(response.data[summoner]);
     var date = new Date();
     response.data[summoner].checked = date.toUTCString();
@@ -71,6 +78,7 @@ router.post('/summoner-stats', function(req, res) {
   console.log('Searching Summoner Stats ' + summonerID + ' @ ' + region);
   riotCall.get(queryUrl)
   .then(function (response) {
+    console.log('>> API Rate Limit: ' + response.headers['x-rate-limit-count']);
     var newObj = {};
     _.forEach(response.data.playerStatSummaries, function(val, index) {
       newObj[val.playerStatSummaryType] = val;
@@ -83,6 +91,41 @@ router.post('/summoner-stats', function(req, res) {
       res.json({error: 404});
     }
     res.send('Couldn\'t Get Summoner Stats');
+  });
+});
+
+router.post('/league', function(req, res) {
+  var region = req.body.region + '';
+  var summonerID = req.body.summonerID + '';
+  var summonerName = req.body.summonerName + '';
+  var queryUrl = buildLeagueUrl(region, summonerID);
+
+  console.log('------');
+  console.log('Searching Summoner League ' + summonerID + ' @ ' + region);
+  riotCall.get(queryUrl)
+  .then(function (response) {
+    console.log('>> API Rate Limit: ' + response.headers['x-rate-limit-count']);
+    var newObj = {};
+    _.forEach(response.data[summonerID], function(val, index) {
+      newObj[val.queue] = {};
+      newObj[val.queue].tier = response.data[summonerID][index].tier;
+      for(var i = 0; i < response.data[summonerID][index]['entries'].length; i++) {
+        if(response.data[summonerID][index]['entries'][i].playerOrTeamName === summonerName) {
+          newObj[val.queue].division = response.data[summonerID][index]['entries'][i].division;
+          newObj[val.queue].wins = response.data[summonerID][index]['entries'][i].wins;
+          newObj[val.queue].losses = response.data[summonerID][index]['entries'][i].losses;
+          return false;
+        }
+      }
+    });
+    res.json(newObj);
+  })
+  .catch(function (error) {
+    console.log(error);
+    if(error.response.status === 404) {
+      res.json({error: 404});
+    }
+    res.send('Couldn\'t Get Summoner League');
   });
 });
 
@@ -100,6 +143,7 @@ router.post('/matches', function(req, res) {
 
   riotCall.get(queryUrl)
   .then(function (response) {
+    console.log('>> API Rate Limit: ' + response.headers['x-rate-limit-count']);
     res.json(response.data);
   })
   .catch(function (error) {
@@ -123,6 +167,7 @@ router.post('/recent', function(req, res) {
 
   riotCall.get(queryUrl)
   .then(function (response) {
+    console.log('>> API Rate Limit: ' + response.headers['x-rate-limit-count']);
     res.json(response.data);
   })
   .catch(function (error) {

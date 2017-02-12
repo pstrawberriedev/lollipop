@@ -6,6 +6,7 @@ import moment from 'moment';
 const LS = localStorage;
 const apiRoot = 'http://localhost:3000'
 import champions from '../data/champions.json';
+import sumSpells from '../data/summoner_spells.json';
 
 let app = {
 
@@ -65,6 +66,7 @@ let app = {
       if(key.name.toLowerCase() === name) {
         self.currentSummoner = key;
         self.displaySummoner();
+        self.displayLeague();
         self.displaySummonerRecentGames();
         self.hideLoader();
       }
@@ -106,6 +108,18 @@ let app = {
       }
     })
     return champ;
+  },
+
+  // Convert: Summoner Spell ID -> Summoner Spell Name
+  championSumSpellsToName(spellkey) {
+    var name = '';
+    _.forEach(sumSpells.data, function(key) {
+      if(parseInt(key['key']) === spellkey) {
+        name = key.id;
+        return false;
+      }
+    })
+    return name;
   },
 
   // Anonymous Funcs
@@ -249,34 +263,6 @@ let app = {
 
   },
 
-  // Get Current Summoner Stats
-  getCurrentSummonerStats() {
-    const self = this;
-    self.showLoader('Getting Summoner Stats');
-
-    console.log('Getting stats for ' + self.currentSummoner.name + ' @ ' + self.currentSummoner.region + ' (' + self.currentSummoner.id + ')')
-    axios.post(apiRoot + '/api/summoner-stats', {
-      summonerID: self.currentSummoner.id,
-      region: self.currentSummoner.region
-    })
-    .then(function (response) {
-      self.hideLoader();
-      if(!response.data.error) {
-        self.currentSummoner.stats = response.data;
-        self.updateCurrentSummoner();
-        self.getCurrentSummonerRecentGames();
-      } else {
-        self.showError('Error getting summoner stats');
-      }
-    })
-    .catch(function (error) {
-      self.hideLoader();
-      self.showError('Something error happened when getting summoner stats');
-      console.log(error);
-    });
-
-  },
-
   // Display Current Summoner
   displaySummoner() {
     const self = this;
@@ -296,12 +282,100 @@ let app = {
     // Name
     self.$summonerInfoWrap.append(
       '<div class="inline-block">' +
-        '<div class="icon">' + profileIcon + '</div>' +
+        '<div class="vertical center">' +
+          '<div class="icon">' + profileIcon + '</div>' +
+        '</div>' +
         '<div class="vertical" id="info-basic">' +
           '<div class="name">' + self.currentSummoner.name + '</div>' +
-          '<div class="level small-body">Level ' + self.currentSummoner.summonerLevel + '</div>' +
+          '<div class="relative bottom-inset" style="height:2px;"></div>' +
+          '<div id="solo-league"></div>' +
+          '<div class="relative bottom-inset" style="height:6px;"></div>' +
+          '<div class="level small-body font-body"><span class="icon-star"></span> Level ' + self.currentSummoner.summonerLevel + '</div>' +
         '</div>' +
       '</div>'
+    );
+
+  },
+
+  // Get Current Summoner Stats
+  getCurrentSummonerStats() {
+    const self = this;
+    self.showLoader('Getting Summoner Stats');
+
+    console.log('Getting stats for ' + self.currentSummoner.name + ' @ ' + self.currentSummoner.region + ' (' + self.currentSummoner.id + ')')
+    axios.post(apiRoot + '/api/summoner-stats', {
+      summonerID: self.currentSummoner.id,
+      region: self.currentSummoner.region
+    })
+    .then(function (response) {
+      self.hideLoader();
+      if(!response.data.error) {
+        self.currentSummoner.stats = response.data;
+        self.updateCurrentSummoner();
+        if(self.currentSummoner.stats.RankedSolo5x5) {
+          self.getCurrentSummonerLeague();
+        } else {
+          self.getCurrentSummonerRecentGames();
+        }
+      } else {
+        self.showError('Error getting summoner stats');
+      }
+    })
+    .catch(function (error) {
+      self.hideLoader();
+      self.showError('Something error happened when getting summoner stats');
+      console.log(error);
+    });
+
+  },
+
+  // Get Current Summoner League
+  getCurrentSummonerLeague() {
+    const self = this;
+    self.showLoader('Getting Summoner League');
+
+    console.log('Getting league for ' + self.currentSummoner.name + ' @ ' + self.currentSummoner.region + ' (' + self.currentSummoner.id + ')')
+    axios.post(apiRoot + '/api/league', {
+      summonerName: self.currentSummoner.name,
+      summonerID: self.currentSummoner.id,
+      region: self.currentSummoner.region
+    })
+    .then(function (response) {
+      self.hideLoader();
+      if(!response.data.error) {
+        self.currentSummoner.league = response.data;
+        self.updateCurrentSummoner();
+        self.displayLeague();
+        self.getCurrentSummonerRecentGames();
+      } else {
+        self.showError('Error getting summoner league');
+      }
+    })
+    .catch(function (error) {
+      self.hideLoader();
+      self.showError('Something error happened when getting summoner stats');
+      console.log(error);
+    });
+
+  },
+
+  // Display Current Summoner
+  displayLeague() {
+    const self = this;
+
+    if(!self.currentSummoner.league.RANKED_SOLO_5x5) {return false;}
+    const soloTier = self.currentSummoner.league.RANKED_SOLO_5x5.tier.toLowerCase();
+    const soloWins = self.currentSummoner.league.RANKED_SOLO_5x5.wins;
+    const soloLosses = self.currentSummoner.league.RANKED_SOLO_5x5.losses;
+    let soloDivision = '';
+    if(self.currentSummoner.league.RANKED_SOLO_5x5.division.toLowerCase() != 'challenger' || 'master') {
+      soloDivision = self.currentSummoner.league.RANKED_SOLO_5x5.division;
+    }
+
+    // Insert League info into already-rendered Summoner Info placeholder
+    $('#solo-league').append(
+      '<img src="images/rank_' + soloTier + '.png" />' + '<div class="rank small-body tiny"><span>Solo Rank</span><span>' +
+      soloTier + ' ' + soloDivision + '</span><span>' + soloWins + 'W / ' + soloLosses + 'L</span></div>'
     );
 
   },
@@ -440,23 +514,32 @@ let app = {
       gameDate = gameDate.format('MMM D hh:mm A');
       let timePlayed = Math.floor(value.stats.timePlayed / 60);
       let winLoss = value.stats.win == true ? 'win' : 'loss';
-      let winLossEle = value.stats.win == true ? 'win <span class="icon-thumbs-up"></span>' : 'loss <span class="icon-thumbs-down"></span>';
-      let doubleKills = value.stats.doubleKills ? '<div class="award small-body tiny"><span class="icon-star"></span> Double x' + value.stats.doubleKills + '</div>' : '';
-      let tripleKills = value.stats.tripleKills ? '<div class="award small-body tiny"><span class="icon-star"></span> Triple x' + value.stats.tripleKills + '</div>' : '';
-      let quadraKills = value.stats.quadraKills ? '<div class="award small-body tiny"><span class="icon-star"></span> Quadra x' + value.stats.quadraKills + '</div>' : '';
-      let pentaKills = value.stats.pentaKills ? '<div class="award small-body tiny"><span class="icon-star"></span> Penta x' + value.stats.pentaKills + '</div>' : '';
-      let wards = value.stats.wardPlaced && value.stats.wardPlaced != undefined ? '<div class="award small-body tiny"><span class="icon-eye"></span> Warded x' + value.stats.wardPlaced + '</div>' : '';
+      let winLossEle = value.stats.win == true ? '<span class="icon-thumbs-up"></span> game won' : '<span class="icon-thumbs-down"></span> game lost';
+      let doubleKills = value.stats.doubleKills ? '<div class="award small-body tiny"><span class="icon-hair-cross"></span> Double Kill: ' + value.stats.doubleKills + '</div>' : '';
+      let tripleKills = value.stats.tripleKills ? '<div class="award small-body tiny"><span class="icon-hair-cross"></span> Triple Kill: ' + value.stats.tripleKills + '</div>' : '';
+      let quadraKills = value.stats.quadraKills ? '<div class="award small-body tiny"><span class="icon-hair-cross"></span> Quadra Kill: ' + value.stats.quadraKills + '</div>' : '';
+      let pentaKills = value.stats.pentaKills ? '<div class="award small-body tiny"><span class="icon-hair-cross"></span> Pentakill: ' + value.stats.pentaKills + '</div>' : '';
+      let wardsPlaced;
+      if(gameType() === 'Normal' || gameType() === 'Ranked') {
+        wardsPlaced = value.stats.wardPlaced && value.stats.wardPlaced != undefined ? '<div class="award small-body tiny"><span class="icon-eye"></span> Wards Placed: ' + value.stats.wardPlaced + '</div>' : '<div class="small-body tiny text-error"><span class="icon-eye"></span> Wards Placed: 0</div>';
+      } else {
+        wardsPlaced = '';
+      }
+      let wardsKilled = value.stats.wardKilled && value.stats.wardKilled != undefined ? '<div class="award small-body tiny"><span class="icon-eye-with-line"></span> Wards Cleared: ' + value.stats.wardKilled + '</div>' : '';
+      var sum1 = '<div class="spell"><img src="http://ddragon.leagueoflegends.com/cdn/7.3.1/img/spell/' + self.championSumSpellsToName(value.spell1) + '.png" /></div>';
+      var sum2 = '<div class="spell"><img src="http://ddragon.leagueoflegends.com/cdn/7.3.1/img/spell/' + self.championSumSpellsToName(value.spell2) + '.png" /></div>';
 
       self.$summonerRecentWrap.append(
       '<div class="game">' +
         '<div class="vertical">' +
-          '<img class="icon" src="http://ddragon.leagueoflegends.com/cdn/7.3.1/img/champion/' + self.championIdToName(value.championId) + '.png" />' + //hero portrait
           '<div class="small-body tiny text-center">' + gameType() + '</div>' +
+          '<img class="icon" src="http://ddragon.leagueoflegends.com/cdn/7.3.1/img/champion/' + self.championIdToName(value.championId) + '.png" />' + //hero portrait
+          '<div class="sum-spells">' + sum1 + sum2 + '</div>' + //sum spells
         '</div>' +
         '<div class="vertical">' +
           '<div class="wl ' + winLoss + ' small-body tiny caps">' + winLossEle + '</div>' + //win loss
-          perfect + doubleKills + tripleKills + quadraKills + pentaKills + wards +
-          '<div class="small-body smaller">' + timePlayed + ' min.</div>' + //game duration
+          perfect + doubleKills + tripleKills + quadraKills + pentaKills + wardsPlaced + wardsKilled +
+          '<div class="small-body tiny text-dark"><span class="icon-stopwatch"></span> ' + timePlayed + ' min.</div>' + //game duration
         '</div>' +
         '<div class="vertical right">' +
           '<div class="kda text-bold text-right">' + kills + '/' + deaths + '/' + assists + '</div>' + //kda
@@ -465,6 +548,7 @@ let app = {
           '<div class="small-body tiny text-right">' + fromDate + '</div>' + //time played from now ("2 hours ago")
         '</div>' +
         '<div class="vertical right">' +
+          '<div class="small-body tiny">Final Build - Lv. ' + value.stats.level + '</div>' +
           itemHtml() +
         '</div>' +
       '</div>'

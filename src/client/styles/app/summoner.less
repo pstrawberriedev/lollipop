@@ -10,6 +10,7 @@
     &.smaller {font-size:.75rem;}
     &.tiny {font-size:.65rem}
     &.caps {text-transform:uppercase;}
+    &.font-body {.font-body;font-weight:normal;}
   }
 
   // Info
@@ -27,17 +28,19 @@
 
       .vertical {
         .block;float:left;
-        height:103px;
         text-align:left;
         margin-left:10px;
+        &.center {text-align:center;}
       }
       .name {
+        .relative;
         margin-top:-3px;
         font-size:1.5rem;
-        margin-bottom:8px;
+        margin-bottom:5px;
+        text-align:center;
       }
       .icon {
-        .block;.relative;float:left;
+        .block;.relative;
         overflow:visible;
         width:auto;
         height:100px;
@@ -52,6 +55,29 @@
           height:110px;
           z-index:2;
           background:transparent url('/images/icon_border.png') no-repeat center center;
+        }
+      }
+      #info-basic .level {
+        .relative;
+        margin-top:7px;
+      }
+      #solo-league {
+        .clearfix;.relative;
+
+        img {
+          .block;float:left;
+          max-width:47px;
+          height:auto;
+          margin-right:8px;
+        }
+        .rank {
+          .block;float:left;
+          padding-top:11px;
+          span {
+            .block;
+            &.inline {.inline}
+            &:first-letter {text-transform:uppercase;}
+          }
         }
       }
     }
@@ -84,7 +110,8 @@
         padding:5px;
         .shadow-1;
 
-          .vertical {
+          // Structure
+          .vertical { //vertical col
             .block;.relative;float:left;
             padding-left:6px;
             &:first-child {padding-left:0;}
@@ -94,17 +121,41 @@
               &:last-child {margin-bottom:0;}
             }
           }
+          .wl, .award { //win/loss, award buttons
+            min-width:102px;
+            max-width:110px;
+            padding:2px 1px;
+            text-align:center;
+            .border-radius(2px);
+          }
+          .award {
+            .text-left;
+          }
 
+          // Champ Icon
           .icon {
             max-width:50px;
             height:auto;
             .border-radius(2px);
           }
 
+          // Summoner Spells
+          .sum-spells {
+            .clearfix;.relative;
+            width:50px;
+
+            .spell {
+              float:left;
+              &:first-child {margin-right:2px;}
+              img {width:24px;height:24px;.border-radius(2px);}
+            }
+          }
+
+          // Right Stats (kda, cs, gold, time ago)
           .kda {font-size:1rem;}
           .cs, .gold {
             height:18px;
-            .border-radius(4px);
+            .border-radius(2px);
             padding:0 3px;
             img {max-height:18px;width:auto;.inline-block;margin-left:4px;}
             span {
@@ -114,22 +165,11 @@
           }
           .gold span {.transform(translateY(-6px));}
 
-          .wl, .award {
-            max-width:45px;
-            padding:2px 1px;
-            text-align:center;
-            .border-radius(4px);
-          }
-          .award {
-            .text-left;
-            max-width:75px;
-          }
-
           //items
           .items {
             .clearfix;
             .relative;
-            margin-right:10px;
+            margin-right:15px;
             margin-top:5px;
 
             .left, .right {float:left;}
@@ -143,7 +183,7 @@
               float:left;
               margin-right:3px;
               width:28px;height:28px;
-              img {width:28px;height:28px;.border-radius(3px);}
+              img {width:28px;height:28px;.border-radius(4px);}
               &:last-child {margin-right:0;}
             }
           }

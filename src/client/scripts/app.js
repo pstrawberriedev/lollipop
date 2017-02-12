@@ -285,7 +285,7 @@ let app = {
       TweenMax.set(self.$summonerInfoWrap, {height:"auto"})
       TweenMax.from(self.$summonerInfoWrap, 0.35, {height:0})
     }
-    TweenMax.to(self.$summonerInfo, .35, { padding:'2rem .6rem', ease:Sine.easeInOut,onComplete:wrapUp });
+    TweenMax.to(self.$summonerInfo, .35, { padding:'2rem 0', ease:Sine.easeInOut,onComplete:wrapUp });
 
     // Profile Icon
     var profileIcon = '';

@@ -33,6 +33,7 @@ let app = {
     app.$search = $('#search');
     app.$searchBar = $('#search-wrap');
     app.$searchTitle = $('#search #title');
+    app.$landing = $('#landing');
     app.$summoner = $('#summoner');
     app.$summonerInfo = $('#summoner-info');
     app.$summonerInfoWrap = $('#info-wrap');
@@ -187,6 +188,8 @@ let app = {
   // Search Shrink/Expand
   searchShrink() {
     const self = this;
+    self.$landing.fadeOut();
+
     TweenMax.to(self.$searchTitle, .2, { y:'50px', autoAlpha:0, ease:Sine.easeInOut });
     TweenMax.to(self.$search, .35, { padding:0, height:0, ease:Sine.easeInOut });
     if(!self.$searchBar.hasClass('on')) {

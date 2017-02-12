@@ -1,0 +1,47 @@
+#landing {
+  .block;.relative;.clearfix;
+
+  h3,p {margin-bottom:15px; }
+  p {
+    line-height:1.3;
+    margin-bottom:12px;
+      a {text-decoration:underline;}
+  }
+  img {
+    .block;
+    max-width:100%;
+    height:auto;
+    margin-bottom:1px;
+  }
+  .row {
+    .block;.relative;.clearfix;width:100%;
+    max-width:1024px;
+    margin-left:auto;margin-right:auto;
+    margin-bottom:2rem;
+    padding-bottom:60px;
+    padding-top:20px;
+    background-size:275px auto;
+    @media(max-width:767px) {
+      background-image:none!important;
+      padding-right:15px!important;
+      padding-left:15px!important;
+    }
+  }
+  .leftRow {
+    background:transparent url('/images/ezreal_render.png') no-repeat 98% top;
+    padding-right:300px;
+    padding-left:15px;
+    .row;
+    &:last-child {
+      background-image:url('/images/riven_render.png');
+      background-position: right center;
+    }
+  }
+  .rightRow {
+    background:transparent url('/images/zed_render.png') no-repeat 2% center;
+    padding-left:300px;
+    padding-right:15px;
+    .row;
+  }
+
+}

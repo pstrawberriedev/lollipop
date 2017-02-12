@@ -244,9 +244,6 @@ let app = {
   getSummoner(sumName, sumRegion) {
     const self = this;
     self.showLoader('Getting Summoner Data');
-    if(self.$summonerInfo.hasClass('on')) {
-      self.$summoner.fadeOut(300);
-    }
 
     //check local data first, if not present, call API
     if(self.autocompleteSummoners.indexOf(sumName) > -1) {

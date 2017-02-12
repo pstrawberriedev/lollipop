@@ -33,6 +33,7 @@ let app = {
     app.$search = $('#search');
     app.$searchBar = $('#search-wrap');
     app.$searchTitle = $('#search #title');
+    app.$summoner = $('#summoner');
     app.$summonerInfo = $('#summoner-info');
     app.$summonerInfoWrap = $('#info-wrap');
     app.$summonerMatches = $('#matches');
@@ -62,13 +63,18 @@ let app = {
   getLocalSummoner(name) {
     const self = this;
     self.showLoader('Getting Summoner Data');
+    self.$summoner.fadeOut(30);
     _.forEach(this.localData, function(key) {
       if(key.name.toLowerCase() === name) {
         self.currentSummoner = key;
         self.displaySummoner();
-        self.displayLeague();
+        if(self.summonerIsRanked()) {
+          self.displayLeague();
+          self.displaySummonerMatches();
+        }
         self.displaySummonerRecentGames();
         self.hideLoader();
+        self.$summoner.fadeIn();
       }
     })
   },
@@ -122,7 +128,7 @@ let app = {
     return name;
   },
 
-  // Anonymous Funcs
+  // Anonymous UI Funcs
   anon() {
     const self = this;
     var nav = document.getElementById('search');
@@ -176,7 +182,6 @@ let app = {
 
     // Anon Resets (page load)
     self.$summonerInfo.removeClass('active');
-    self.$summonerMatches.removeClass('active');
   },
 
   // Search Shrink/Expand
@@ -184,7 +189,9 @@ let app = {
     const self = this;
     TweenMax.to(self.$searchTitle, .2, { y:'50px', autoAlpha:0, ease:Sine.easeInOut });
     TweenMax.to(self.$search, .35, { padding:0, height:0, ease:Sine.easeInOut });
-    TweenMax.to(self.$searchBar, .35, { y:'-50px', marginRight:10, autoAlpha:0, ease:Sine.easeInOut, onComplete:cloneSearch });
+    if(!self.$searchBar.hasClass('on')) {
+      TweenMax.to(self.$searchBar, .35, { y:'-50px', marginRight:10, autoAlpha:0, ease:Sine.easeInOut, onComplete:cloneSearch });
+    }
     TweenMax.to(self.$nav, .35, { backgroundColor:'#FF3D7F', ease:Sine.easeInOut });
     TweenMax.to(self.$navIcons, .35, { color:'#f0f0f0', ease:Sine.easeInOut });
     self.$devMenu.addClass('swap');
@@ -196,10 +203,11 @@ let app = {
       $('#logo').fadeIn();
       TweenMax.to($('#logo'), .35, { x:0, autoAlpha:1, ease:Sine.easeInOut});
       TweenMax.to(self.$searchBar, .35, { y:0, autoAlpha:1, ease:Sine.easeInOut});
+      self.$searchBar.addClass('on');
     }
   },
 
-  // loader
+  // loader Show/Hide
   showLoader(message) {
     this.$loader.show();
     if(message) {
@@ -223,10 +231,22 @@ let app = {
     },3500)
   },
 
+  // Check if Summoner is Ranked
+  summonerIsRanked() {
+    if(this.currentSummoner.stats.RankedSolo5x5.losses != 0 || this.currentSummoner.stats.RankedSolo5x5.wins != 0) {
+      return true;
+    } else {
+      return false;
+    }
+  },
+
   // Get New Summoner -> Make Current
   getSummoner(sumName, sumRegion) {
     const self = this;
     self.showLoader('Getting Summoner Data');
+    if(self.$summonerInfo.hasClass('on')) {
+      self.$summoner.fadeOut(300);
+    }
 
     //check local data first, if not present, call API
     if(self.autocompleteSummoners.indexOf(sumName) > -1) {
@@ -267,11 +287,19 @@ let app = {
   displaySummoner() {
     const self = this;
     self.$summonerInfoWrap.html('');
+
     function wrapUp() {
+      self.$summonerInfo.addClass('on');
       TweenMax.set(self.$summonerInfoWrap, {height:"auto"})
       TweenMax.from(self.$summonerInfoWrap, 0.35, {height:0})
+      self.$summoner.fadeIn();
     }
-    TweenMax.to(self.$summonerInfo, .35, { padding:'2rem 0', ease:Sine.easeInOut,onComplete:wrapUp });
+    if(!self.$summonerInfo.hasClass('on')) {
+      TweenMax.to(self.$summonerInfoWrap, 0.35, {autoAlpha:1, ease:Sine.easeInOut});
+      TweenMax.to(self.$summonerInfo, .35, { padding:'2rem 0px', ease:Sine.easeInOut,onComplete:wrapUp });
+    } else {
+      self.$summoner.fadeIn();
+    }
 
     // Profile Icon
     var profileIcon = '';
@@ -279,7 +307,6 @@ let app = {
       profileIcon = '<img src="https://ddragon.leagueoflegends.com/cdn/7.2.1/img/profileicon/' + self.currentSummoner.profileIconId + '.png" />'
     }
 
-    // Name
     self.$summonerInfoWrap.append(
       '<div class="inline-block">' +
         '<div class="vertical center">' +
@@ -287,10 +314,9 @@ let app = {
         '</div>' +
         '<div class="vertical" id="info-basic">' +
           '<div class="name">' + self.currentSummoner.name + '</div>' +
-          '<div class="relative bottom-inset" style="height:2px;"></div>' +
-          '<div id="solo-league"></div>' +
-          '<div class="relative bottom-inset" style="height:6px;"></div>' +
           '<div class="level small-body font-body"><span class="icon-star"></span> Level ' + self.currentSummoner.summonerLevel + '</div>' +
+          '<div class="relative bottom-inset" style="height:5px;"></div>' +
+          '<div id="solo-league"><img src="images/rank_none.png" /><div class="rank small-body tiny"><span>Solo Rank</span><span>Unranked</span></div></div>' +
         '</div>' +
       '</div>'
     );
@@ -312,7 +338,7 @@ let app = {
       if(!response.data.error) {
         self.currentSummoner.stats = response.data;
         self.updateCurrentSummoner();
-        if(self.currentSummoner.stats.RankedSolo5x5) {
+        if(self.summonerIsRanked()) {
           self.getCurrentSummonerLeague();
         } else {
           self.getCurrentSummonerRecentGames();
@@ -362,8 +388,9 @@ let app = {
   // Display Current Summoner
   displayLeague() {
     const self = this;
+    $('#solo-league').html('');
 
-    if(!self.currentSummoner.league.RANKED_SOLO_5x5) {return false;}
+    //if(!self.currentSummoner.league || !self.currentSummoner.league.RANKED_SOLO_5x5) {return false;}
     const soloTier = self.currentSummoner.league.RANKED_SOLO_5x5.tier.toLowerCase();
     const soloWins = self.currentSummoner.league.RANKED_SOLO_5x5.wins;
     const soloLosses = self.currentSummoner.league.RANKED_SOLO_5x5.losses;
@@ -424,12 +451,7 @@ let app = {
     const self = this;
     self.$summonerMatches.html('');
 
-    // Total Matches
-    if(self.currentSummoner.name) {
-      self.$summonerInfo.append(
-        '<div class="name">' + self.currentSummoner.name + '</div>'
-      );
-    }
+
   },
 
   // Get Summoner Recent Games
@@ -448,8 +470,12 @@ let app = {
         var newArr = [...response.data.games];
         self.currentSummoner.recent = newArr;
         self.updateCurrentSummoner();
-        self.getCurrentSummonerMatches();
         self.displaySummonerRecentGames();
+
+        //check if summoner is ranked before trying to get matches
+        if(self.summonerIsRanked()) {
+          self.getCurrentSummonerMatches();
+        }
       } else {
         // if no matches, throw an 'unranked' flag
         var noMatches = !response.data.games.length > -1 ? ' ' + self.currentSummoner.name + ' - no recent games found' : '';
@@ -508,7 +534,7 @@ let app = {
       let kills = value.stats.championsKilled == undefined ? '<span class="kills">0</span>' : '<span class="kills">' + value.stats.championsKilled + '</span>';
       let deaths = value.stats.numDeaths == undefined ? '<span class="deaths">0</span>' : '<span class="deaths">' + value.stats.numDeaths + '</span>';
       let assists = value.stats.assists == undefined ? '<span class="assists">0</span>' : '<span class="assists">' + value.stats.assists + '</span>';;
-      let perfect = value.stats.numDeaths == undefined ? '<div class="award small-body smaller"><span class="icon-star"></span> 0 deaths</div>' : '';
+      let perfect = value.stats.numDeaths == undefined ? '<div class="award small-body tiny"><span class="icon-man"></span> No Deaths</div>' : '';
       let gameDate = moment(value.createDate);
       let fromDate = gameDate.fromNow();
       gameDate = gameDate.format('MMM D hh:mm A');

@@ -38,11 +38,11 @@ body.theme-default {
   // Nav + Logo
   //#logo {color:@default-secondary;}
   nav#nav {
-    background:@default-primary;
+    background:@default-nav;
 
-      #nav-main .link {color:@default-light;}
-      #nav-main .nav-icon {border-color:@default-light;color:@default-light;}
-      #dev-menu {background:@default-primary;}
+      #nav-main .link {color:@default-dark;}
+      #nav-main .nav-icon {border-color:@default-dark;color:@default-dark;}
+      #dev-menu {background:@default-nav;}
       #dev-menu.swap {background:@default-secondary;}
   }
 
@@ -53,6 +53,11 @@ body.theme-default {
       color:@default-light;
       //text-shadow: 0px 2px 3px rgba(0, 0, 0, .5);
     }
+  }
+
+  // landing
+  #landing {
+    .rightRow {background-color:@default-primary;color:@default-light;}
   }
 
   // Summoner

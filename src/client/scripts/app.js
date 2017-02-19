@@ -461,6 +461,7 @@ let app = {
         self.getCurrentSummonerRecentGames();
       } else {
         self.showError('Error getting summoner league');
+        self.getCurrentSummonerRecentGames();
       }
     })
     .catch(function (error) {
@@ -557,11 +558,7 @@ let app = {
         self.currentSummoner.recent = newArr;
         self.updateCurrentSummoner();
         self.displaySummonerRecentGames();
-
-        //check if summoner is ranked before trying to get matches
-        if(self.summonerIsRanked()) {
-          self.getCurrentSummonerMatches();
-        }
+        self.getCurrentSummonerSpellMastery();
       } else {
         // if no matches, throw an 'unranked' flag
         var noMatches = !response.data.games.length > -1 ? ' ' + self.currentSummoner.name + ' - no recent games found' : '';
@@ -667,7 +664,70 @@ let app = {
       );
 
     }
-  }
+  },
+
+  // Get Current Summoner Spell Masteries
+  getCurrentSummonerSpellMastery() {
+    const self = this;
+    self.showLoader('Getting Summoner Masteries');
+
+    console.log('Getting spell masteries for ' + self.currentSummoner.name + ' @ ' + self.currentSummoner.region + ' (' + self.currentSummoner.id + ')')
+    axios.post(apiRoot + '/api/spell-mastery', {
+      summonerID: self.currentSummoner.id,
+      region: self.currentSummoner.region
+    })
+    .then(function (response) {
+      self.hideLoader();
+      if(!response.data.error) {
+        self.currentSummoner.spellMastery = response.data;
+        self.updateCurrentSummoner();
+        self.getCurrentSummonerSpellRunes();
+      } else {
+        self.showError('Error getting summoner spell mastery');
+        self.getCurrentSummonerSpellRunes();
+      }
+    })
+    .catch(function (error) {
+      self.hideLoader();
+      self.showError('Something error happened when getting summoner stats');
+      console.log(error);
+    });
+
+  },
+
+  // Get Current Summoner Spell Runes
+  getCurrentSummonerSpellRunes() {
+    const self = this;
+    self.showLoader('Getting Summoner Runes');
+
+    console.log('Getting runes for ' + self.currentSummoner.name + ' @ ' + self.currentSummoner.region + ' (' + self.currentSummoner.id + ')')
+    axios.post(apiRoot + '/api/spell-runes', {
+      summonerID: self.currentSummoner.id,
+      region: self.currentSummoner.region
+    })
+    .then(function (response) {
+      self.hideLoader();
+      if(!response.data.error) {
+        self.currentSummoner.runes = response.data;
+        self.updateCurrentSummoner();
+        if(self.summonerIsRanked()) {
+          self.getCurrentSummonerMatches();
+        }
+      } else {
+        self.showError('Error getting summoner runes');
+        //check if summoner is ranked before trying to get matches
+        if(self.summonerIsRanked()) {
+          self.getCurrentSummonerMatches();
+        }
+      }
+    })
+    .catch(function (error) {
+      self.hideLoader();
+      self.showError('Something error happened when getting summoner runes');
+      console.log(error);
+    });
+
+  },
 
 }
 

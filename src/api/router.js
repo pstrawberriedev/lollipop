@@ -52,6 +52,18 @@ function buildMasteryUrl(region, summonerID) {
       'player/' + summonerID + '/topchampions' + apiKey + '&count=25';
   return newUrl;
 }
+function buildSpellMasteryUrl(region, summonerID) {
+  var newUrl = buildRegionUrl(region) +
+      region.toLowerCase() + '/v1.4/summoner/' +
+      summonerID + '/masteries' + apiKey;
+  return newUrl;
+}
+function buildSpellRunesUrl(region, summonerID) {
+  var newUrl = buildRegionUrl(region) +
+      region.toLowerCase() + '/v1.4/summoner/' +
+      summonerID + '/runes' + apiKey;
+  return newUrl;
+}
 
 // SUMMONER NAME
 //
@@ -225,6 +237,58 @@ router.post('/mastery', function(req, res) {
       res.json({error: 404});
     }
     res.send('Couldn\'t Get Summoner Mastery');
+  });
+
+});
+
+// SUMMONER CHAMPION SPELL MASTERY
+//
+router.post('/spell-mastery', function(req, res) {
+  var summonerID = req.body.summonerID + '';
+  var region = req.body.region + '';
+  var queryUrl = buildSpellMasteryUrl(region, summonerID);
+
+  console.log('------');
+  console.log('Searching SummonerID Spell Mastery' + summonerID + ' @ ' + region);
+  console.log(queryUrl);
+
+  riotCall.get(queryUrl)
+  .then(function (response) {
+    console.log('>> API Rate Limit: ' + response.headers['x-rate-limit-count']);
+    res.json(response.data[summonerID].pages);
+  })
+  .catch(function (error) {
+    console.log(error);
+    if(error.response.status === 404) {
+      res.json({error: 404});
+    }
+    res.send('Couldn\'t Get Summoner Spell Mastery');
+  });
+
+});
+
+// SUMMONER CHAMPION SPELL RUNES
+//
+router.post('/spell-runes', function(req, res) {
+  var summonerID = req.body.summonerID + '';
+  var region = req.body.region + '';
+  var queryUrl = buildSpellRunesUrl(region, summonerID);
+
+  console.log('------');
+  console.log('Searching SummonerID Spell Runes' + summonerID + ' @ ' + region);
+  console.log(queryUrl);
+
+  riotCall.get(queryUrl)
+  .then(function (response) {
+    console.log('>> API Rate Limit: ' + response.headers['x-rate-limit-count']);
+    res.json(response.data[summonerID].pages);
+  })
+  .catch(function (error) {
+    console.log(error);
+    if(error.response.status === 404) {
+      res.json({error: 404});
+    }
+    res.send('Couldn\'t Get Summoner Runes');
   });
 
 });

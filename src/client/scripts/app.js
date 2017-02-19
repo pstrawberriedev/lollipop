@@ -404,13 +404,13 @@ let app = {
       var champName = self.championIdToName(self.currentSummoner.mastery[i].championId);
       var highMastery = '';
       if(self.currentSummoner.mastery[i].championLevel >= 5) {
-        highMastery = '<div class="mastery-level small-body tiny"><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span></div>';
+        highMastery = '<div class="mastery-level"><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span></div>';
       }
       if(self.currentSummoner.mastery[i].championLevel === 4) {
-        highMastery = '<div class="mastery-level small-body tiny"><span class="icon-star"></span><span class="icon-star"></span></div>';
+        highMastery = '<div class="mastery-level"><span class="icon-star"></span><span class="icon-star"></span></div>';
       }
       if(self.currentSummoner.mastery[i].championLevel === 3) {
-        highMastery = '<div class="mastery-level small-body tiny"><span class="icon-star"></span></div>';
+        highMastery = '<div class="mastery-level"><span class="icon-star"></span></div>';
       }
 
 

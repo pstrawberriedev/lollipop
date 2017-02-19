@@ -27,6 +27,7 @@
     "babel-preset-es2015": "^6.22.0",
     "copy-webpack-plugin": "^4.0.1",
     "css-loader": "^0.26.1",
+    "dragscroll": "0.0.8",
     "extract-text-webpack-plugin": "^1.0.1",
     "gsap": "^1.19.1",
     "jquery": "^3.1.1",

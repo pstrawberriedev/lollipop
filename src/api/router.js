@@ -6,8 +6,15 @@ var router = express.Router();
 var apiKey = require('./secret.js');
 var payload = {};
 
-function buildRegionUrl(region) {
-  return 'https://' + region.toLowerCase() + '.api.pvp.net/api/lol/';
+// URL CONSTRUCTORS
+//
+function buildRegionUrl(region, opt) {
+  if(!opt) {
+    return 'https://' + region.toLowerCase() + '.api.pvp.net/api/lol/';
+  }
+  if(opt === 'baseOnly') {
+    return 'https://' + region.toLowerCase() + '.api.pvp.net/'
+  }
 }
 function buildSummonerUrl(region, summoner) {
   var newUrl = buildRegionUrl(region) +
@@ -39,11 +46,19 @@ function buildRecentUrl(region, summonerID) {
       summonerID + '/recent' + apiKey;
   return newUrl;
 }
+function buildMasteryUrl(region, summonerID) {
+  var newUrl = buildRegionUrl(region, 'baseOnly') +
+      '/championmastery/location/' + region.toUpperCase() + '1/' +
+      'player/' + summonerID + '/champions' + apiKey;
+  return newUrl;
+}
 
-// ++ API POSTS
+// SUMMONER NAME
+//
 router.post('/summoner', function(req, res) {
   var region = req.body.region + '';
   var summoner = req.body.name + '';
+  summoner = summoner.toLowerCase();
   var queryUrl = buildSummonerUrl(region, summoner);
 
   console.log('------');
@@ -69,6 +84,8 @@ router.post('/summoner', function(req, res) {
 
 });
 
+// SUMMONER STATS
+//
 router.post('/summoner-stats', function(req, res) {
   var region = req.body.region + '';
   var summonerID = req.body.summonerID + '';
@@ -94,6 +111,8 @@ router.post('/summoner-stats', function(req, res) {
   });
 });
 
+// SUMMONER LEAGUE
+//
 router.post('/league', function(req, res) {
   var region = req.body.region + '';
   var summonerID = req.body.summonerID + '';
@@ -129,6 +148,8 @@ router.post('/league', function(req, res) {
   });
 });
 
+// SUMMONER MATCHES
+//
 router.post('/matches', function(req, res) {
   var summonerID = req.body.summonerID + '';
   var region = req.body.region + '';
@@ -156,6 +177,8 @@ router.post('/matches', function(req, res) {
 
 });
 
+// SUMMONER RECENT GAMES
+//
 router.post('/recent', function(req, res) {
   var summonerID = req.body.summonerID + '';
   var region = req.body.region + '';
@@ -180,5 +203,30 @@ router.post('/recent', function(req, res) {
 
 });
 
+// SUMMONER CHAMPION MASTERY
+//
+router.post('/mastery', function(req, res) {
+  var summonerID = req.body.summonerID + '';
+  var region = req.body.region + '';
+  var queryUrl = buildMasteryUrl(region, summonerID);
+
+  console.log('------');
+  console.log('Searching SummonerID Champ Mastery' + summonerID + ' @ ' + region);
+  console.log(queryUrl);
+
+  riotCall.get(queryUrl)
+  .then(function (response) {
+    console.log('>> API Rate Limit: ' + response.headers['x-rate-limit-count']);
+    res.json(response.data);
+  })
+  .catch(function (error) {
+    console.log(error);
+    if(error.response.status === 404) {
+      res.json({error: 404});
+    }
+    res.send('Couldn\'t Get Summoner Mastery');
+  });
+
+});
 
 module.exports = router;

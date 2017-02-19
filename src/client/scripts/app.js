@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import TweenMax from 'gsap';
+import 'dragscroll';
 import axios from 'axios';
 import _ from 'lodash';
 import moment from 'moment';
@@ -37,6 +38,8 @@ let app = {
     app.$summoner = $('#summoner');
     app.$summonerInfo = $('#summoner-info');
     app.$summonerInfoWrap = $('#info-wrap');
+    app.$summonerInfoBasic = $('#info-main');
+    app.$summonerInfoMastery = $('#mastery-wrap');
     app.$summonerMatches = $('#matches');
     app.$summonerMatchesWrap = $('#matches-wrap');
     app.$summonerRecent = $('#recent-games');
@@ -51,7 +54,7 @@ let app = {
   // Local Summoner Data Functions
   storeLocalSummoner(data) {
     this.localData.push(data);
-    this.autocompleteSummoners.push(data.name.toLowerCase());
+    this.autocompleteSummoners.push(this.sumName);
     this.currentSummoner = data;
     if(this.localData.length === 5) {
       this.localData.splice(1,1);
@@ -66,9 +69,10 @@ let app = {
     self.showLoader('Getting Summoner Data');
     self.$summoner.fadeOut(30);
     _.forEach(this.localData, function(key) {
-      if(key.name.toLowerCase() === name) {
+      if(key.name.replace(/\s/g,'').toLowerCase() === name) {
         self.currentSummoner = key;
         self.displaySummoner();
+        self.displaySummonerMastery();
         if(self.summonerIsRanked()) {
           self.displayLeague();
           self.displaySummonerMatches();
@@ -156,7 +160,7 @@ let app = {
 
     // Search Handlers
     this.$sumName.on('keyup', function(e) {
-      self.sumName = $(this).val().replace(/\s/g,'');
+      self.sumName = $(this).val().replace(/\s/g,'').toLowerCase();
       if(e.which === 13) {
         self.getSummoner(self.sumName, self.sumRegion);
         self.searchShrink();
@@ -236,11 +240,16 @@ let app = {
 
   // Check if Summoner is Ranked
   summonerIsRanked() {
-    if(this.currentSummoner.stats.RankedSolo5x5.losses != 0 || this.currentSummoner.stats.RankedSolo5x5.wins != 0) {
-      return true;
+    if(this.currentSummoner.stats.RankedSolo5x5) {
+      if(this.currentSummoner.stats.RankedSolo5x5.losses != 0 && this.currentSummoner.stats.RankedSolo5x5.wins != 0) {
+        return true;
+      } else {
+        return false;
+      }
     } else {
       return false;
     }
+
   },
 
   // Get New Summoner -> Make Current
@@ -286,7 +295,7 @@ let app = {
   // Display Current Summoner
   displaySummoner() {
     const self = this;
-    self.$summonerInfoWrap.html('');
+    self.$summonerInfoBasic.html('');
 
     function wrapUp() {
       self.$summonerInfo.addClass('on');
@@ -307,17 +316,15 @@ let app = {
       profileIcon = '<img src="https://ddragon.leagueoflegends.com/cdn/7.2.1/img/profileicon/' + self.currentSummoner.profileIconId + '.png" />'
     }
 
-    self.$summonerInfoWrap.append(
-      '<div class="inline-block">' +
-        '<div class="vertical center">' +
-          '<div class="icon">' + profileIcon + '</div>' +
-        '</div>' +
-        '<div class="vertical" id="info-basic">' +
-          '<div class="name">' + self.currentSummoner.name + '</div>' +
-          '<div class="level small-body font-body"><span class="icon-star"></span> Level ' + self.currentSummoner.summonerLevel + '</div>' +
-          '<div class="relative bottom-inset" style="height:5px;"></div>' +
-          '<div id="solo-league"><img src="images/rank_none.png" /><div class="rank small-body tiny"><span>Solo Rank</span><span>Unranked</span></div></div>' +
-        '</div>' +
+    self.$summonerInfoBasic.append(
+      '<div class="vertical center">' +
+        '<div class="icon">' + profileIcon + '</div>' +
+      '</div>' +
+      '<div class="vertical" id="info-basic">' +
+        '<div class="name">' + self.currentSummoner.name + '</div>' +
+        '<div class="level small-body font-body"><span class="icon-star"></span> Level ' + self.currentSummoner.summonerLevel + '</div>' +
+        '<div class="relative bottom-inset" style="height:5px;"></div>' +
+        '<div id="solo-league"><img src="images/rank_none.png" /><div class="rank small-body tiny"><span>Solo Rank</span><span>Unranked</span></div></div>' +
       '</div>'
     );
 
@@ -338,6 +345,37 @@ let app = {
       if(!response.data.error) {
         self.currentSummoner.stats = response.data;
         self.updateCurrentSummoner();
+        self.getCurrentSummonerMastery();
+      } else {
+        self.showError('Error getting summoner stats');
+        self.getCurrentSummonerMastery();
+      }
+    })
+    .catch(function (error) {
+      self.hideLoader();
+      self.showError('Something error happened when getting summoner stats');
+      console.log(error);
+    });
+
+  },
+
+  // Get Current Summoner Mastery
+  getCurrentSummonerMastery() {
+    const self = this;
+    self.showLoader('Getting Summoner Champ Mastery');
+
+    console.log('Getting mastery for ' + self.currentSummoner.name + ' @ ' + self.currentSummoner.region + ' (' + self.currentSummoner.id + ')')
+    axios.post(apiRoot + '/api/mastery', {
+      summonerID: self.currentSummoner.id,
+      region: self.currentSummoner.region
+    })
+    .then(function (response) {
+      self.hideLoader();
+      if(!response.data.error) {
+        self.currentSummoner.mastery = response.data;
+        self.updateCurrentSummoner();
+        self.displaySummonerMastery();
+        $(window).trigger('resize');
         if(self.summonerIsRanked()) {
           self.getCurrentSummonerLeague();
         } else {
@@ -352,6 +390,44 @@ let app = {
       self.showError('Something error happened when getting summoner stats');
       console.log(error);
     });
+
+  },
+
+  // Display Current Summoner Mastery
+  displaySummonerMastery() {
+    const self = this;
+    self.$summonerInfoMastery.html('');
+
+    var totalChampsPlayed = self.currentSummoner.mastery.length;
+
+    for(let i = 0; i < 16; i++) {
+      var champName = self.championIdToName(self.currentSummoner.mastery[i].championId);
+      var highMastery = self.currentSummoner.mastery[i].championLevel === 7 ? '<div class="mastery-level small-body tiny"><span class="icon-star"></span></div>' : '';
+
+      self.$summonerInfoMastery.append(
+        '<div class="vertical">' +
+          '<img src="http://ddragon.leagueoflegends.com/cdn/img/champion/loading/' + champName + '_0.jpg" />' +
+          highMastery +
+        '</div>'
+      )
+
+      if(i === 15 || !self.currentSummoner.mastery[i]) {
+        $(window).trigger('resize');//sloppy
+        $(window).off().on('resize', function() {
+          var container = Math.floor(app.$summonerInfoWrap.width());
+          var basic = Math.floor(app.$summonerInfoBasic.width());
+          var adjustment = container - basic;
+          var total = $('#mastery-wrap .vertical').length;
+          var singleWidth = $('#mastery-wrap .vertical').width() + 10;
+          app.$summonerInfoMastery.width(singleWidth * total);
+          $('#info-mastery').width(adjustment);
+        })
+        //sloppy
+        setTimeout(function() {
+          $(window).trigger('resize');
+        },500);
+      }
+    }
 
   },
 
@@ -385,7 +461,7 @@ let app = {
 
   },
 
-  // Display Current Summoner
+  // Display Current Summoner League
   displayLeague() {
     const self = this;
     $('#solo-league').html('');
@@ -574,7 +650,7 @@ let app = {
           '<div class="small-body tiny text-right">' + fromDate + '</div>' + //time played from now ("2 hours ago")
         '</div>' +
         '<div class="vertical right">' +
-          '<div class="small-body tiny">Final Build - Lv. ' + value.stats.level + '</div>' +
+          '<div class="small-body tiny item-header">Final Build - Lv. ' + value.stats.level + '</div>' +
           itemHtml() +
         '</div>' +
       '</div>'

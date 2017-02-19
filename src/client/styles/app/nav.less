@@ -41,6 +41,8 @@ nav#nav {
         .transform(translateY(-.3rem));
         .transition(opacity .15s ease-in-out);
         &:hover {.opacity(.6)}
+
+        @media(max-width:800px) {display:none;}
       }
 
       .search {
@@ -80,7 +82,6 @@ nav#nav {
     right:0;
     width:100%;
     padding: .4rem .12rem 0 0;
-    .shadow-2;
     z-index:20;
     .nav-icon {
       font-size:1.3rem;

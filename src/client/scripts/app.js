@@ -400,9 +400,19 @@ let app = {
 
     var totalChampsPlayed = self.currentSummoner.mastery.length;
 
-    for(let i = 0; i < 16; i++) {
+    for(let i = 0; i < self.currentSummoner.mastery.length; i++) {
       var champName = self.championIdToName(self.currentSummoner.mastery[i].championId);
-      var highMastery = self.currentSummoner.mastery[i].championLevel === 7 ? '<div class="mastery-level small-body tiny"><span class="icon-star"></span></div>' : '';
+      var highMastery = '';
+      if(self.currentSummoner.mastery[i].championLevel >= 5) {
+        highMastery = '<div class="mastery-level small-body tiny"><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span></div>';
+      }
+      if(self.currentSummoner.mastery[i].championLevel === 4) {
+        highMastery = '<div class="mastery-level small-body tiny"><span class="icon-star"></span><span class="icon-star"></span></div>';
+      }
+      if(self.currentSummoner.mastery[i].championLevel === 3) {
+        highMastery = '<div class="mastery-level small-body tiny"><span class="icon-star"></span></div>';
+      }
+
 
       self.$summonerInfoMastery.append(
         '<div class="vertical">' +
@@ -411,7 +421,7 @@ let app = {
         '</div>'
       )
 
-      if(i === 15 || !self.currentSummoner.mastery[i]) {
+      if(i + 1 === self.currentSummoner.mastery.length) {
         $(window).trigger('resize');//sloppy
         $(window).off().on('resize', function() {
           var container = Math.floor(app.$summonerInfoWrap.width());

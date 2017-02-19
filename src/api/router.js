@@ -49,7 +49,7 @@ function buildRecentUrl(region, summonerID) {
 function buildMasteryUrl(region, summonerID) {
   var newUrl = buildRegionUrl(region, 'baseOnly') +
       '/championmastery/location/' + region.toUpperCase() + '1/' +
-      'player/' + summonerID + '/champions' + apiKey;
+      'player/' + summonerID + '/topchampions' + apiKey + '&count=25';
   return newUrl;
 }
 

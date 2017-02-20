@@ -8,6 +8,7 @@ const LS = localStorage;
 const apiRoot = 'http://localhost:3000'
 import champions from '../data/champions.json';
 import sumSpells from '../data/summoner_spells.json';
+import sumRunes from '../data/runes.json';
 
 let app = {
 
@@ -44,6 +45,8 @@ let app = {
     app.$summonerMatchesWrap = $('#matches-wrap');
     app.$summonerRecent = $('#recent-games');
     app.$summonerRecentWrap = $('#recent-wrap');
+    app.$summonerRunes = $('#summoner-runes');
+    app.$summonerMasteries = $('#summoner-masteries');
 
     console.log('%c Lollipop App Started ', 'background: #ddd; color: #9b1851;font-weight:bold;');
     this.syncLocalData();
@@ -78,6 +81,9 @@ let app = {
           self.displaySummonerMatches();
         }
         self.displaySummonerRecentGames();
+        if(self.currentSummoner.runes) {
+          self.displaySummonerRunes();
+        }
         self.hideLoader();
         self.$summoner.fadeIn();
       }
@@ -427,10 +433,15 @@ let app = {
           var container = Math.floor(app.$summonerInfoWrap.width());
           var basic = Math.floor(app.$summonerInfoBasic.width());
           var adjustment = container - basic;
+          var mobileAdjustment = container;
           var total = $('#mastery-wrap .vertical').length;
           var singleWidth = $('#mastery-wrap .vertical').width() + 10;
           app.$summonerInfoMastery.width(singleWidth * total);
-          $('#info-mastery').width(adjustment);
+          if(window.innerWidth < 801) {
+            $('#info-mastery').width(mobileAdjustment);
+          } else {
+            $('#info-mastery').width(adjustment);
+          }
         })
         //sloppy
         setTimeout(function() {
@@ -695,7 +706,7 @@ let app = {
 
   },
 
-  // Get Current Summoner Spell Runes
+  // Get Current Summoner Runes
   getCurrentSummonerSpellRunes() {
     const self = this;
     self.showLoader('Getting Summoner Runes');
@@ -710,6 +721,7 @@ let app = {
       if(!response.data.error) {
         self.currentSummoner.runes = response.data;
         self.updateCurrentSummoner();
+        self.displaySummonerRunes();
         if(self.summonerIsRanked()) {
           self.getCurrentSummonerMatches();
         }
@@ -728,6 +740,98 @@ let app = {
     });
 
   },
+
+  // Display Current Summoner Runes
+  displaySummonerRunes() {
+    const self = this;
+    if(!self.currentSummoner.runes) {return}
+    self.$summonerRunes.html('');
+    self.$summonerRunes.append('<h2 class="runes">Rune Pages</h2>');
+    self.$summonerRunes.append('<div id="rune-page-list"></div>');
+
+    var $list = $('#rune-page-list');
+    var numPages = self.currentSummoner.runes.length;
+    var runeImgBaseUrl = 'http://ddragon.leagueoflegends.com/cdn/7.3.3/img/rune/';
+    var activePage, activeIndex;
+
+    // Summoner Runes loop
+    _.forEach(self.currentSummoner.runes, function(key, index) {
+      var pageName = key.name;
+      var pageSlots = key.slots;
+      if(key.current === true) {
+        activePage = key.id;
+        activeIndex = index;
+      }
+      $list.append('<a class="rune-page" href="##" data-runepage="' + key.id + '">' + pageName + '</a>');
+    });
+    self.$summonerRunes.append('<div id="rune-display"></div>');
+    getRunePage(activeIndex);
+
+    // Switch pages click event
+    $('a.rune-page').off().on('click', function() {
+      var newPage = $(this).attr('data-runepage');
+      for(var i = 0; i < self.currentSummoner.runes.length; i++) {
+        if(parseInt(self.currentSummoner.runes[i].id) === parseInt(newPage)) {
+          $('a.rune-page').removeClass('active');
+          getRunePage(i);
+          $(this).addClass('active');
+        }
+      }
+    });
+
+    // Generate Rune Page markup against static runes json
+    function getRunePage(pageIndex) {
+      var runePage = self.currentSummoner.runes[pageIndex];
+      var container = $('#rune-display');
+      container.html('');
+      $('[data-runepage="' + runePage.id + '"]').addClass('active');
+      container.append('<div class="runes"></div>');
+      var runesContainer = $('#rune-display .runes');
+      var runesArr = [];
+
+      // loop and inject markup
+      for(var i = 0; i < runePage.slots.length; i++) {
+        var currentRune = parseInt(runePage.slots[i].runeId);
+        var currentRuneObj = sumRunes.data[currentRune];
+        var typeIndex = sumRunes.data[currentRune].tags.length - 1;
+        var currentRuneType = sumRunes.data[currentRune].tags[typeIndex];
+
+        runesArr.push(currentRuneObj);
+
+        if(i + 1 === runePage.slots.length) {
+
+          // marks injection
+          var uniqueRunes = {};
+          for(var ii = 0; ii < runesArr.length; ii++) {
+            var runeIdString = parseInt(runesArr[ii].id);
+            if(!uniqueRunes[runeIdString]) {
+              uniqueRunes[runeIdString] = runesArr[ii];
+              uniqueRunes[runeIdString].count = 0;
+            }
+            if(runesArr[ii].id === uniqueRunes[runeIdString].id) {
+              uniqueRunes[runeIdString].count++;
+            }
+
+            if(ii + 1 === runesArr.length) {
+              _.forEach(uniqueRunes, function(key) {
+                runesContainer.append(
+                  '<div class="rune">' +
+                    '<img src="' + runeImgBaseUrl + key.image.full + '" />' +
+                    '<div class="rune-name">' + key.name + ' x' + key.count + '</div>' +
+                  '</div>'
+                );
+              })
+            }
+          }
+
+        }
+
+      };
+
+
+    }
+
+  }
 
 }
 

@@ -39,6 +39,7 @@ body.theme-default {
   nav#nav {
     background:@default-nav;
 
+      #nav-main {color:@default-light;}
       #nav-main .link {color:@default-dark;}
       #nav-main .nav-icon {border-color:@default-dark;color:@default-dark;}
       #dev-menu {background:@default-nav;}
@@ -80,6 +81,36 @@ body.theme-default {
         .icon-star {color:@default-yellow;}
       }
       .cs,.gold {background:@default-gray-lighter;}
+    }
+
+    //runes
+    #summoner-runes {
+
+      #rune-page-list {
+        border-color:@default-gray-lighter;
+      }
+
+      a.rune-page {
+        border-color:@default-gray-lighter;
+        &.active {
+          background:@default-gray-lighter;
+          border-color:@default-dark;
+        }
+        &.active:hover {
+          .opacity(1);
+        }
+      }
+
+      #rune-display {
+        a.rune-page {border-color:@default-gray-lighter;}
+        border-color:@default-gray-lighter;
+        @media(max-width:949px) {
+          .rune:nth-child(even) {
+            background:@default-gray-lighter;
+          }
+        }
+      }
+
     }
   }
 

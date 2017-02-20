@@ -30,6 +30,8 @@
       #info-main {
         .inline-block;margin-top:10px;
         height:110px;
+
+        .vertical:first-child {margin-left:0;}
       }
       #info-mastery {
         .absolute;height:120px;top:0;right:0;
@@ -117,6 +119,18 @@
         }
       }
 
+      @media(max-width:800px) {
+        .text-center;
+        #info-main,#info-mastery {.clearfix;float:none;}
+        #info-mastery {
+          .relative;.block;width:100%;
+          margin-left:0;margin-top:15px;
+          overflow-x:visible;
+          height:140px;
+          .vertical:first-child {margin-left:0;}
+        }
+      }
+
     }
   }
 
@@ -129,10 +143,15 @@
 
   // Recent Games
   #recent-games {
-    .clearfix;.relative;float:left;
+    .relative;float:left;
     overflow:hidden;
-    width:440px;
+    width:45%;
     padding:15px;
+    @media(max-width:800px) {
+      .clearfix;float:none;margin:auto;
+      width:100%;
+      overflow:visible;
+    }
 
     #recent-wrap {
       .block;.relative;width:100%;
@@ -158,6 +177,7 @@
               &:last-child {margin-bottom:0;}
             }
           }
+
           .wl, .award { //win/loss, award buttons
             min-width:102px;
             max-width:110px;
@@ -203,10 +223,7 @@
           .gold span {.transform(translateY(-6px));}
 
           //items
-          .item-header {
-            .block;.relative;
-            margin-top:10px;
-          }
+          .item-header {.block;.relative;.text-left}
           .items {
             .clearfix;
             .relative;
@@ -228,11 +245,90 @@
             }
           }
       }
+      @media(max-width:975px) {
+        .game {.text-center}
+        .game .vertical, .game .vertical.right {float:none;.clearfix;.inline-block;vertical-align:top;}
+        .game .vertical:nth-child(2) {padding:3px 15px 0 15px;.text-left;}
+        .game .vertical.right:last-child {float:none;.block;.text-center;}
+        .game .items {
+          .inline-block;margin-right:0;
+          .left, .left .top, .left .bottom, .right {
+            .inline-block;float:none;margin-bottom:0;padding-top:0;
+          }
+        }
+        .game .item-header {.text-center;margin-top:8px;}
+      }
+    }
+  }
+
+  // Runes
+  #summoner-runes {
+    .relative;float:right;
+    width:55%;
+    padding:15px;
+
+    h2.runes {
+      font-size:1.8rem;
+      margin-bottom:1rem;
+    }
+
+    #rune-page-list {
+      padding:6px 0 0 6px;
+      border:1px solid transparent;
+    }
+    a.rune-page {
+      .inline-block;.relative;
+      font-size:.9rem;
+      cursor:pointer;
+      padding:4px;
+      font-weight:bold;
+      border:2px solid transparent;
+      margin:0 6px 6px 0;
+
+      .transition(opacity .15s ease-in-out);
+      &.active {.border-radius(1px)}
+      &:hover {.opacity(.6)}
+      &:last-child {margin-right:0;}
+    }
+
+    #rune-display {
+      padding:6px 6px 10px 6px;
+      border:1px solid transparent;
+      border-top:0;
+      margin-bottom:1.6rem;
+
+      .rune {
+        .block;.clearfix;.relative;
+        margin-bottom:8px;
+        &:last-child {margin-bottom:0;}
+
+        img,.rune-name {float:left;}
+        img {.block;width:32px;height:32px;}
+        .rune-name {
+          height:32px;padding-top:10px;
+          font-size:.8rem;font-weight:bold;
+          margin-left:8px;
+        }
+      }
+
+    }
+
+    @media(max-width:800px) {
+      .clearfix;float:none;margin:auto;width:100%;
+    }
+    @media(max-width:949px) {
+      #rune-display .rune {
+        text-align:center;
+        padding:3px 0 8px 0;
+        img, .rune-name {.clearfix;float:none;}
+        .rune-name {padding-top:3px;height:auto;}
+        img {.inline-block;}
+      }
     }
   }
 
   // Matches
-  .matches {
+  #matches {
 
     .clearfix;
     &.active {display:block;}

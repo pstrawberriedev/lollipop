@@ -786,6 +786,7 @@ let app = {
       container.html('');
       $('[data-runepage="' + runePage.id + '"]').addClass('active');
       container.append('<div class="runes"></div>');
+      container.append('<div class="runes-visual"><img class="bg" src="images/rune-bg.png" /><div class="m"></div><div class="s"></div><div class="g"></div><div class="q"></div></div>');
       var runesContainer = $('#rune-display .runes');
       var runesArr = [];
 
@@ -797,6 +798,18 @@ let app = {
         var currentRuneType = sumRunes.data[currentRune].tags[typeIndex];
 
         runesArr.push(currentRuneObj);
+        if(currentRuneType === 'mark') {
+          $('#rune-display .runes-visual .m').append('<img class="single ' + currentRuneType + '" src="' + runeImgBaseUrl + sumRunes.data[currentRune].image.full + '" />');
+        }
+        if(currentRuneType === 'seal') {
+          $('#rune-display .runes-visual .s').append('<img class="single ' + currentRuneType + '" src="' + runeImgBaseUrl + sumRunes.data[currentRune].image.full + '" />');
+        }
+        if(currentRuneType === 'glyph') {
+          $('#rune-display .runes-visual .g').append('<img class="single ' + currentRuneType + '" src="' + runeImgBaseUrl + sumRunes.data[currentRune].image.full + '" />');
+        }
+        if(currentRuneType === 'quintessence') {
+          $('#rune-display .runes-visual .q').append('<img class="single ' + currentRuneType + '" src="' + runeImgBaseUrl + sumRunes.data[currentRune].image.full + '" />');
+        }
 
         if(i + 1 === runePage.slots.length) {
 

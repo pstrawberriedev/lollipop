@@ -311,8 +311,65 @@
         }
       }
 
+      .runes-visual {
+        .block;.relative;width:320px;
+        margin:1rem auto 0 auto;
+        img.bg {
+          .block;margin:auto;
+          width:320px;height:auto;
+          z-index:1;
+        }
+        img.single {
+          position:absolute;z-index:2;
+          max-width:26px;height:auto;
+          bottom:3px;left:3px;
+        }
+        .m .mark {
+          &:nth-child(1) {bottom: 4px;left: 11px;}
+          &:nth-child(2) {bottom: 4px;left: 41px;}
+          &:nth-child(3) {bottom: 4px;left: 77px;}
+          &:nth-child(4) {bottom: 32px;left: 4px;}
+          &:nth-child(5) {bottom: 34px;left: 34px;}
+          &:nth-child(6) {bottom: 27px;left: 61px;}
+          &:nth-child(7) {bottom: 57px;left: 16px;}
+          &:nth-child(8) {bottom: 55px;left: 54px;}
+          &:nth-child(9) {bottom: 76px;left: 35px;}
+        }
+        .s .seal {
+          &:nth-child(1) {bottom: 98px;left: 17px;}
+          &:nth-child(2) {bottom: 99px;left: 52px;}
+          &:nth-child(3) {bottom: 121px;left: 32px;}
+          &:nth-child(4) {bottom: 133px;left: 59px;}
+          &:nth-child(5) {bottom: 155px;left: 74px;}
+          &:nth-child(6) {bottom: 168px;left: 102px;}
+          &:nth-child(7) {bottom: 177px;left: 130px;}
+          &:nth-child(8) {bottom: 186px;left: 161px;}
+          &:nth-child(9) {bottom: 162px;left: 175px;}
+        }
+        .g .glyph {
+          &:nth-child(1) {bottom: 184px;left: 194px;}
+          &:nth-child(2) {bottom: 161px;left: 211px;}
+          &:nth-child(3) {bottom: 185px;left: 227px;}
+          &:nth-child(4) {bottom: 142px;left: 234px;}
+          &:nth-child(5) {bottom: 165px;left: 249px;}
+          &:nth-child(6) {bottom: 185px;left: 267px;}
+          &:nth-child(7) {bottom: 168px;left: 291px;}
+          &:nth-child(8) {bottom: 148px;left: 271px;}
+          &:nth-child(9) {bottom: 123px;left: 282px;}
+        }
+        .q .quintessence {
+          &:nth-child(1) {bottom: 159px;left: 25px;}
+          &:nth-child(2) {bottom: 68px;left: 101px;}
+          &:nth-child(3) {bottom: 96px;left: 208px;}
+        }
+      }
+
     }
 
+    @media(max-width:374px) {
+      #rune-display .runes-visual {margin-left:-22px;}
+      #rune-display {padding-bottom:0;}
+    }
     @media(max-width:800px) {
       .clearfix;float:none;margin:auto;width:100%;
     }
